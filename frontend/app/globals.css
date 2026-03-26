@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #2563EB;
+  --color-background: #0F172A;
+  --color-card: #1E293B;
+  --color-alert: #EF4444;
+  --color-success: #22C55E;
+  --color-text-primary: #F1F5F9;
+  --color-text-muted: #94A3B8;
+  --color-border: #334155;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom scrollbar styling (dark themed) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Glassmorphism utility class */
+.glass {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+@theme {
+  --color-primary: #2563EB;
+  --color-background: #0F172A;
+  --color-card: #1E293B;
+  --color-alert: #EF4444;
+  --color-success: #22C55E;
+  --color-text-primary: #F1F5F9;
+  --color-text-muted: #94A3B8;
+  --color-border: #334155;
+}
