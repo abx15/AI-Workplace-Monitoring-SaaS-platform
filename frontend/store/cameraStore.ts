@@ -9,6 +9,7 @@ interface CameraState {
   addCamera: (data: any) => Promise<void>
   deleteCamera: (id: string) => Promise<void>
   assignCamera: (cameraId: string, operatorId: string) => Promise<void>
+  updateCameraStatus: (cameraId: string, status: Camera['status']) => void
 }
 
 export const useCameraStore = create<CameraState>((set) => ({
@@ -55,5 +56,13 @@ export const useCameraStore = create<CameraState>((set) => ({
     } catch (error) {
       console.error('Failed to assign camera', error)
     }
+  },
+
+  updateCameraStatus: (cameraId, status) => {
+    set((state) => ({
+      cameras: state.cameras.map((c) => 
+        c.id === cameraId ? { ...c, status } : c
+      )
+    }))
   },
 }))

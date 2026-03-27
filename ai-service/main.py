@@ -52,12 +52,14 @@ app = FastAPI(
 )
 
 # CORS Middleware
+origins = [
+    os.getenv("FRONTEND_URL", "http://localhost:3000"),
+    os.getenv("BACKEND_URL", "http://localhost:5000")
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        os.getenv("FRONTEND_URL", "http://localhost:3000"),
-        os.getenv("BACKEND_URL", "http://localhost:5000")
-    ],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -66,6 +68,15 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     print("AI Service starting up...")
+    
+    # Initialize MongoDB connection
+    from app.config.db import get_mongo_db
+    mongo_db = get_mongo_db()
+    if mongo_db is not None:
+        print("✅ MongoDB initialized successfully")
+    else:
+        print("❌ MongoDB initialization failed")
+    
     test_connections()
     
     # STEP 16 — Model singleton pattern

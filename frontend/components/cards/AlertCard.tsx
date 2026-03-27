@@ -3,6 +3,7 @@
 import { Alert } from '@/types'
 import { Eye, CheckCircle, XCircle, Clock, MapPin, Camera as CameraIcon } from 'lucide-react'
 import { clsx } from 'clsx'
+import Image from 'next/image'
 
 interface AlertCardProps {
   alert: Alert
@@ -22,10 +23,11 @@ export default function AlertCard({ alert, onResolve, onIgnore }: AlertCardProps
     <div className="glass overflow-hidden rounded-3xl border border-[#334155]/50 group hover:border-[#2563EB]/30 transition-all duration-300">
       <div className="relative aspect-video bg-[#0F172A] overflow-hidden">
         {alert.screenshot_url ? (
-          <img 
+          <Image 
             src={alert.screenshot_url} 
             alt="Alert screenshot" 
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#334155]">

@@ -1,37 +1,45 @@
 import { useEffect } from 'react'
 import { socket, connectSocket, disconnectSocket } from '../lib/socket'
 import { useAlertStore } from '../store/alertStore'
+import { useCameraStore } from '../store/cameraStore'
 import { useAuthStore } from '../store/authStore'
+import { toast } from 'sonner'
+import { Camera } from '../types'
 
 export const useSocket = () => {
-  const { token } = useAuthStore()
+  const { token, user } = useAuthStore()
   const { addAlert } = useAlertStore()
+  const { updateCameraStatus } = useCameraStore()
 
   useEffect(() => {
-    if (token) {
-      connectSocket(token)
+    if (!token || !user) return
 
-      socket.on('new_alert', (alert) => {
-        addAlert(alert)
-        // Show notification logic can go here
-      })
+    connectSocket(token)
 
-      socket.on('live_detection', (detection) => {
-        // Handle live detection updates (e.g., for specific camera feed)
-      })
+    socket.on('connect', () => {
+      console.log('Socket connected')
+      socket.emit('join_company', user.company_id)
+    })
 
-      socket.on('camera_status', (data) => {
-        // Update camera status in store if needed
-      })
-    }
+    socket.on('new_alert', (alert) => {
+      addAlert(alert)
+      toast.error(`Alert: ${alert.type} detected!`)
+    })
+
+    socket.on('camera_status', ({ camera_id, status }: { camera_id: string, status: Camera['status'] }) => {
+      updateCameraStatus(camera_id, status)
+    })
+
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected')
+    })
 
     return () => {
-      disconnectSocket()
       socket.off('new_alert')
-      socket.off('live_detection')
       socket.off('camera_status')
+      socket.off('connect')
+      socket.off('disconnect')
+      disconnectSocket()
     }
-  }, [token, addAlert])
-
-  return socket
+  }, [token, user, addAlert, updateCameraStatus])
 }

@@ -1,187 +1,193 @@
 import { Request, Response } from 'express';
-import { z } from 'zod';
-import pool from '../config/neon.config';
+import { Camera } from '../models/Camera';
 
-const cameraSchema = z.object({
-  name: z.string().min(2),
-  rtsp_url: z.string().url(),
-  location: z.string().optional(),
-});
-
-const assignSchema = z.object({
-  operator_id: z.string().uuid(),
-});
-
-export const addCamera = async (req: Request, res: Response) => {
+// Get all cameras for a company
+export const getCameras = async (req: Request, res: Response) => {
   try {
-    const validatedData = cameraSchema.parse(req.body);
-    const { name, rtsp_url, location } = validatedData;
-    const company_id = req.user?.company_id;
+    const { companyId } = req.body; // Should come from auth middleware
 
-    // 1. Get company plan and current camera count
-    const companyRes = await pool.query(
-      'SELECT plan, max_cameras FROM companies WHERE id = $1',
-      [company_id]
-    );
-    const { plan, max_cameras } = companyRes.rows[0];
+    const cameras = await Camera.find({ companyId, isActive: true })
+      .select('-__v')
+      .sort({ createdAt: -1 });
 
-    const countRes = await pool.query(
-      'SELECT COUNT(*) FROM cameras WHERE company_id = $1',
-      [company_id]
-    );
-    const currentCount = parseInt(countRes.rows[0].count);
+    res.json({
+      success: true,
+      data: cameras
+    });
 
-    if (plan !== 'enterprise' && currentCount >= max_cameras) {
-      return res.status(403).json({
+  } catch (error: any) {
+    console.error('Get cameras error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Get camera by ID
+export const getCameraById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { companyId } = req.body; // Should come from auth middleware
+
+    const camera = await Camera.findOne({ 
+      _id: id, 
+      companyId, 
+      isActive: true 
+    }).select('-__v');
+
+    if (!camera) {
+      return res.status(404).json({
         success: false,
-        message: `Camera limit reached for ${plan} plan (${max_cameras}). Please upgrade your plan.`,
+        message: 'Camera not found'
       });
     }
 
-    // 2. Insert camera
-    const cameraRes = await pool.query(
-      'INSERT INTO cameras (name, rtsp_url, location, company_id) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, rtsp_url, location, company_id]
-    );
+    res.json({
+      success: true,
+      data: camera
+    });
+
+  } catch (error: any) {
+    console.error('Get camera error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Create new camera
+export const createCamera = async (req: Request, res: Response) => {
+  try {
+    const { companyId } = req.body; // Should come from auth middleware
+    const { name, location, rtspUrl } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: 'Camera name is required'
+      });
+    }
+
+    const camera = new Camera({
+      companyId,
+      name,
+      location,
+      rtspUrl
+    });
+
+    await camera.save();
 
     res.status(201).json({
       success: true,
-      data: cameraRes.rows[0],
-      message: 'Camera added successfully',
+      message: 'Camera created successfully',
+      data: camera
     });
-  } catch (err: any) {
-    res.status(400).json({
-      success: false,
-      error: err.errors || err.message,
-    });
-  }
-};
 
-export const getCameras = async (req: Request, res: Response) => {
-  try {
-    const { role, company_id, userId } = req.user!;
-    let query = 'SELECT * FROM cameras WHERE company_id = $1';
-    let params = [company_id];
-
-    if (role === 'operator') {
-      query += ' AND operator_id = $2';
-      params.push(userId);
-    }
-
-    const cameraRes = await pool.query(query, params);
-
-    res.json({
-      success: true,
-      data: cameraRes.rows,
-    });
-  } catch (err: any) {
+  } catch (error: any) {
+    console.error('Create camera error:', error);
     res.status(500).json({
       success: false,
-      message: err.message,
+      message: 'Internal server error'
     });
   }
 };
 
+// Update camera
 export const updateCamera = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, location, status } = req.body;
-    const company_id = req.user?.company_id;
+    const { companyId } = req.body; // Should come from auth middleware
+    const updates = req.body;
 
-    const cameraRes = await pool.query(
-      'UPDATE cameras SET name = COALESCE($1, name), location = COALESCE($2, location), status = COALESCE($3, status) WHERE id = $4 AND company_id = $5 RETURNING *',
-      [name, location, status, id, company_id]
-    );
+    // Remove sensitive fields
+    delete updates.companyId;
+    delete updates._id;
 
-    if (cameraRes.rows.length === 0) {
+    const camera = await Camera.findOneAndUpdate(
+      { _id: id, companyId, isActive: true },
+      updates,
+      { new: true, runValidators: true }
+    ).select('-__v');
+
+    if (!camera) {
       return res.status(404).json({
         success: false,
-        message: 'Camera not found',
+        message: 'Camera not found'
       });
     }
 
     res.json({
       success: true,
-      data: cameraRes.rows[0],
       message: 'Camera updated successfully',
+      data: camera
     });
-  } catch (err: any) {
-    res.status(400).json({
+
+  } catch (error: any) {
+    console.error('Update camera error:', error);
+    res.status(500).json({
       success: false,
-      message: err.message,
+      message: 'Internal server error'
     });
   }
 };
 
+// Delete camera (soft delete)
 export const deleteCamera = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const company_id = req.user?.company_id;
+    const { companyId } = req.body; // Should come from auth middleware
 
-    const deleteRes = await pool.query(
-      'DELETE FROM cameras WHERE id = $1 AND company_id = $2 RETURNING id',
-      [id, company_id]
+    const camera = await Camera.findOneAndUpdate(
+      { _id: id, companyId, isActive: true },
+      { isActive: false },
+      { new: true }
     );
 
-    if (deleteRes.rows.length === 0) {
+    if (!camera) {
       return res.status(404).json({
         success: false,
-        message: 'Camera not found',
+        message: 'Camera not found'
       });
     }
 
     res.json({
       success: true,
-      message: 'Camera deleted successfully',
+      message: 'Camera deleted successfully'
     });
-  } catch (err: any) {
+
+  } catch (error: any) {
+    console.error('Delete camera error:', error);
     res.status(500).json({
       success: false,
-      message: err.message,
+      message: 'Internal server error'
     });
   }
 };
 
-export const assignCamera = async (req: Request, res: Response) => {
+// Get cameras by location
+export const getCamerasByLocation = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { operator_id } = assignSchema.parse(req.body);
-    const company_id = req.user?.company_id;
+    const { location } = req.params;
+    const { companyId } = req.body; // Should come from auth middleware
 
-    // Verify operator belongs to same company
-    const operatorRes = await pool.query(
-      'SELECT id FROM users WHERE id = $1 AND company_id = $2 AND role = $3',
-      [operator_id, company_id, 'operator']
-    );
-
-    if (operatorRes.rows.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invdalid operator for this company',
-      });
-    }
-
-    const cameraRes = await pool.query(
-      'UPDATE cameras SET operator_id = $1 WHERE id = $2 AND company_id = $3 RETURNING *',
-      [operator_id, id, company_id]
-    );
-
-    if (cameraRes.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Camera not found',
-      });
-    }
+    const cameras = await Camera.find({ 
+      companyId, 
+      location, 
+      isActive: true 
+    }).select('-__v').sort({ name: 1 });
 
     res.json({
       success: true,
-      data: cameraRes.rows[0],
-      message: 'Camera assigned to operator successfully',
+      data: cameras
     });
-  } catch (err: any) {
-    res.status(400).json({
+
+  } catch (error: any) {
+    console.error('Get cameras by location error:', error);
+    res.status(500).json({
       success: false,
-      error: err.errors || err.message,
+      message: 'Internal server error'
     });
   }
 };

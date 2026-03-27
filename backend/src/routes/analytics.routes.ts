@@ -1,17 +1,24 @@
 import { Router } from 'express';
 import { 
-  getAILogs, 
-  getDetectionEvents, 
-  getStatsOverview 
+  getDashboardAnalytics, 
+  getEmployeeProductivity, 
+  getCameraAnalytics 
 } from '../controllers/analytics.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
+import { requireManager } from '../middleware/role.middleware';
 
 const router = Router();
 
+// All routes require authentication
 router.use(authMiddleware);
 
-router.get('/logs', getAILogs);
-router.get('/events', getDetectionEvents);
-router.get('/overview', getStatsOverview);
+// GET /api/analytics/dashboard - Get dashboard analytics
+router.get('/dashboard', getDashboardAnalytics);
+
+// GET /api/analytics/productivity - Get employee productivity analytics
+router.get('/productivity', requireManager, getEmployeeProductivity);
+
+// GET /api/analytics/cameras - Get camera analytics
+router.get('/cameras', getCameraAnalytics);
 
 export default router;

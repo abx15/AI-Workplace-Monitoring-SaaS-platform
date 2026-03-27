@@ -1,21 +1,49 @@
 import { Request, Response, NextFunction } from 'express';
+import { User } from '../models/User';
 
-export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({
-      success: false,
-      message: 'Access denied. Admin privileges required.',
-    });
-  }
-  next();
+// Role-based access control
+export const requireRole = (roles: string[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const user = await User.findById(req.user.userId);
+      
+      if (!user || !user.isActive) {
+        return res.status(401).json({
+          success: false,
+          message: 'User not found or inactive'
+        });
+      }
+
+      if (!roles.includes(user.role)) {
+        return res.status(403).json({
+          success: false,
+          message: 'Insufficient permissions'
+        });
+      }
+
+      next();
+    } catch (error: any) {
+      console.error('Role middleware error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  };
 };
 
-export const requireOperator = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user || !['admin', 'operator'].includes(req.user.role)) {
-    return res.status(403).json({
-      success: false,
-      message: 'Access denied. Unauthorized role.',
-    });
-  }
-  next();
-};
+// Require admin role
+export const requireAdmin = requireRole(['admin']);
+
+// Require manager or admin role
+export const requireManager = requireRole(['manager', 'admin']);
+
+// Require supervisor, manager, or admin role
+export const requireSupervisor = requireRole(['supervisor', 'manager', 'admin']);

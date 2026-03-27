@@ -1,12 +1,83 @@
-'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Check, ShieldCheck, Zap, Globe, Clock, History, CreditCard, ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'
 import { toast } from 'sonner'
+import { subscriptionApi } from '@/lib/api/subscription.api'
+import { useAuthStore } from '@/store/authStore'
 
 export default function AdminSubscription() {
   const [selectedPlan, setSelectedPlan] = useState('Pro')
+  const { user } = useAuthStore()
+
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.async = true
+    document.body.appendChild(script)
+    return () => {
+      document.body.removeChild(script)
+    }
+  }, [])
+
+  const fetchSubscription = async () => {
+    try {
+      await subscriptionApi.getCurrent()
+      // Update state if needed
+    } catch (error) {
+      console.error('Failed to fetch subscription', error)
+    }
+  }
+
+  const handleUpgrade = async (plan: string) => {
+    try {
+      toast.loading(`Initializing payment for ${plan}...`)
+      
+      // 1. Create order from backend
+      const { data } = await subscriptionApi.createOrder(plan)
+      
+      toast.dismiss()
+
+      // 2. Open Razorpay checkout
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: 'INR',
+        name: 'AI Workplace Monitor',
+        description: `${plan} Plan Subscription`,
+        order_id: data.razorpay_order_id,
+        handler: async (response: any) => {
+          // 3. Verify payment
+          try {
+            toast.loading('Verifying payment...')
+            await subscriptionApi.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              plan: plan
+            })
+            toast.dismiss()
+            toast.success('Plan upgraded successfully!')
+            fetchSubscription()
+          } catch (error) {
+            toast.dismiss()
+            toast.error('Payment verification failed.')
+          }
+        },
+        prefill: {
+          name: user?.name,
+          email: user?.email
+        },
+        theme: { color: '#2563EB' }
+      }
+      
+      const razorpay = new (window as any).Razorpay(options)
+      razorpay.open()
+      
+    } catch (error) {
+      toast.dismiss()
+      toast.error('Payment initialization failed. Try again.')
+    }
+  }
 
   const plans = [
     {
@@ -35,15 +106,6 @@ export default function AdminSubscription() {
       color: 'blue'
     }
   ]
-
-  const handlePayment = async (plan: string) => {
-    toast.info(`Initializing payment for ${plan} plan...`)
-    // Razorpay logic integration placeholder
-    setTimeout(() => {
-      toast.success('Successfully subscribed to ' + plan)
-    }, 2000)
-  }
-
   return (
     <div className="space-y-10 pb-10">
       <div className="flex flex-col gap-1">
@@ -113,7 +175,7 @@ export default function AdminSubscription() {
             </div>
 
             <button 
-              onClick={() => handlePayment(plan.name)}
+              onClick={() => handleUpgrade(plan.name)}
               className={clsx(
                 'w-full py-4 rounded-3xl font-black transition-all active:scale-95 text-sm',
                 plan.popular 

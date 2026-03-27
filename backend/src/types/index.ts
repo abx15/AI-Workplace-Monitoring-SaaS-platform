@@ -60,11 +60,3 @@ export interface JWTPayload {
   role: 'admin' | 'operator';
   company_id: string;
 }
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JWTPayload;
-    }
-  }
-}
