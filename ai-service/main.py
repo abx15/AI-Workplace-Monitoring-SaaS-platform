@@ -36,8 +36,8 @@ import os
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import detect, recognize, analyze
-from app.services.face_service import FaceService
+from app.routes import detect, analyze
+# from app.services.face_service import FaceService
 from app.services.yolo_service import YOLOService
 from app.config.db import test_connections
 from app.utils.preprocess import decode_base64_image
@@ -82,20 +82,20 @@ async def startup_event():
     # STEP 16 — Model singleton pattern
     # Load models once and store in app.state
     print("Loading AI Models...")
-    app.state.face_service = FaceService()
+    # app.state.face_service = FaceService()
     app.state.yolo_service = YOLOService()
     print("AI Service ready ✅")
 
 # Include Routers
 app.include_router(detect.router, prefix="/detect", tags=["Detection"])
-app.include_router(recognize.router, prefix="/recognize", tags=["Face Recognition"])
+# app.include_router(recognize.router, prefix="/recognize", tags=["Face Recognition"])
 app.include_router(analyze.router, prefix="/analyze", tags=["Video Analysis"])
 
 @app.get("/health")
 async def health_check():
     return {
         "status": "ok",
-        "models_loaded": hasattr(app.state, "face_service") and hasattr(app.state, "yolo_service"),
+        "models_loaded": hasattr(app.state, "yolo_service"),
         "timestamp": datetime.utcnow().isoformat()
     }
 

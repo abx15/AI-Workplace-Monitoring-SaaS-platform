@@ -21,7 +21,7 @@ export default function LandingPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-40 pb-32 overflow-hidden">
+      <section className="relative pt-20 sm:pt-32 md:pt-40 pb-16 sm:pb-24 md:pb-32 overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full -z-10">
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#2563EB]/10 rounded-full blur-[120px] animate-pulse" />
@@ -29,7 +29,7 @@ export default function LandingPage() {
           <div className="absolute top-0 left-0 w-full h-full opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#2563EB 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         </div>
 
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -44,7 +44,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.95] text-white"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter leading-[0.95] text-white"
             >
               AI-Powered <br />
               <span className="bg-gradient-to-r from-[#2563EB] to-[#60A5FA] bg-clip-text text-transparent">Workplace Intelligence</span>
@@ -54,7 +54,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-xl text-[#94A3B8] max-w-2xl mx-auto font-medium"
+              className="text-lg sm:text-xl md:text-xl text-[#94A3B8] max-w-2xl mx-auto font-medium"
             >
               Monitor your workforce in real-time with advanced face recognition, 
               behavior analysis, and instant smart alerts.
@@ -84,7 +84,7 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-20 border-t border-white/5"
+              className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 pt-20 border-t border-white/5"
             >
               {[
                 { label: '500+', sub: 'Companies' },
@@ -93,8 +93,8 @@ export default function LandingPage() {
                 { label: '10K+', sub: 'Cameras' },
               ].map((stat, i) => (
                 <div key={i} className="text-center group">
-                  <div className="text-3xl font-black text-white group-hover:text-[#2563EB] transition-colors">{stat.label}</div>
-                  <div className="text-[10px] text-[#64748B] font-black uppercase tracking-widest">{stat.sub}</div>
+                  <div className="text-2xl sm:text-3xl md:text-3xl font-black text-white group-hover:text-[#2563EB] transition-colors">{stat.label}</div>
+                  <div className="text-[8px] sm:text-[10px] md:text-[10px] text-[#64748B] font-black uppercase tracking-widest">{stat.sub}</div>
                 </div>
               ))}
             </motion.div>
@@ -104,7 +104,7 @@ export default function LandingPage() {
 
       {/* Hero Mockup */}
       <section className="pb-32 relative">
-         <div className="container mx-auto px-6">
+         <div className="container mx-auto px-4 sm:px-6">
             <motion.div 
               initial={{ opacity: 0, y: 100 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -124,25 +124,25 @@ export default function LandingPage() {
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" className="py-32 bg-[#020617] relative">
-         <div className="container mx-auto px-6">
+      <section id="how-it-works" className="py-16 sm:py-24 md:py-32 bg-[#020617] relative">
+         <div className="container mx-auto px-4 sm:px-6">
             <div className="max-w-xl mx-auto text-center space-y-4 mb-20">
                <h2 className="text-[10px] text-[#2563EB] font-black uppercase tracking-[0.4em]">The Process</h2>
-               <h3 className="text-4xl md:text-6xl font-black text-white tracking-tighter">Your Setup in Seconds</h3>
+               <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter">Your Setup in Seconds</h3>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-12">
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
                {[
                  { icon: Camera, title: "Connect Cameras", desc: "Easily integrate any IP/RTSP camera using our simple dashboard in seconds." },
                  { icon: Shield, title: "AI Analysis", desc: "Our neural networks process data instantly for face recognition & behavior." },
                  { icon: Bell, title: "Smart Alerts", desc: "Get real-time push notifications the moment an incident is detected." },
                ].map((step, i) => (
-                 <div key={i} className="relative group p-10 glass rounded-[40px] border border-white/5 hover:border-[#2563EB]/30 transition-all">
-                    <div className="w-20 h-20 bg-[#2563EB]/10 rounded-3xl flex items-center justify-center mb-8 border border-[#2563EB]/20 group-hover:scale-110 transition-transform">
-                       <step.icon className="w-8 h-8 text-[#2563EB]" />
+                 <div key={i} className="relative group p-6 sm:p-8 lg:p-10 glass rounded-[40px] border border-white/5 hover:border-[#2563EB]/30 transition-all">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2563EB]/10 rounded-3xl flex items-center justify-center mb-6 sm:mb-8 border border-[#2563EB]/20 group-hover:scale-110 transition-transform">
+                       <step.icon className="w-6 h-6 sm:w-8 sm:h-8 text-[#2563EB]" />
                     </div>
-                    <div className="text-3xl font-black text-white mb-4 tracking-tight">{step.title}</div>
-                    <p className="text-[#94A3B8] font-medium leading-relaxed">{step.desc}</p>
+                    <div className="text-2xl sm:text-2xl lg:text-3xl font-black text-white mb-4 tracking-tight">{step.title}</div>
+                    <p className="text-sm sm:text-base text-[#94A3B8] font-medium leading-relaxed">{step.desc}</p>
                     <div className="absolute bottom-10 right-10 text-8xl font-black text-white opacity-[0.02] tracking-tighter">{i+1}</div>
                  </div>
                ))}
@@ -151,18 +151,18 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="py-32 relative overflow-hidden">
+      <section id="features" className="py-16 sm:py-24 md:py-32 relative overflow-hidden">
          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-[#2563EB]/5 rounded-full blur-[200px] -z-10" />
          
-         <div className="container mx-auto px-6">
-            <div className="grid lg:grid-cols-2 gap-20 items-center">
+         <div className="container mx-auto px-4 sm:px-6">
+            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-20 items-center">
                <div className="space-y-10">
                   <div className="space-y-4">
                      <h2 className="text-[10px] text-[#2563EB] font-black uppercase tracking-[0.4em]">Core Capabilities</h2>
                      <h3 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95]">Powerful Features <br />For Modern Teams</h3>
                   </div>
                   
-                  <div className="grid md:grid-cols-2 gap-8">
+                  <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                      {[
                        { icon: UserCheck, title: "Face Recognition", desc: "Identity tracking with 99.9% accuracy" },
                        { icon: BarChart3, title: "Live Analytics", desc: "Real-time workforce data visualizer" },
@@ -208,15 +208,15 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section (Simplified from subscription page) */}
-      <section id="pricing" className="py-32 bg-[#020617]">
-         <div className="container mx-auto px-6">
+      <section id="pricing" className="py-16 sm:py-24 md:py-32 bg-[#020617]">
+         <div className="container mx-auto px-4 sm:px-6">
             <div className="text-center max-w-2xl mx-auto space-y-6 mb-20">
                <h2 className="text-[10px] text-[#2563EB] font-black uppercase tracking-[0.4em]">Pricing Plans</h2>
                <h3 className="text-4xl md:text-6xl font-black tracking-tighter">Scalable Plans for Everyone</h3>
                <p className="text-[#94A3B8] font-medium text-lg">Choose the perfect plan to grow your business.</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
                {[
                   { name: "Basic", price: "999", cameras: "2", features: ["Real-time Monitoring", "7 Days History", "Email Notifications", "Standard Support"] },
                   { name: "Pro", price: "2,999", cameras: "10", features: ["Advanced Face Recognition", "30 Days History", "SMS & WhatsApp Alerts", "Dedicated Support", "Analytics Dashboard"], popular: true },
@@ -260,9 +260,9 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-32 bg-[#020617] border-t border-white/5">
-         <div className="container mx-auto px-6">
-            <div className="grid md:grid-cols-3 gap-12">
+      <section className="py-16 sm:py-24 md:py-32 bg-[#020617] border-t border-white/5">
+         <div className="container mx-auto px-4 sm:px-6">
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
                {[
                   { name: "Rahul Sharma", role: "Factory Manager, Delhi", quote: "The face recognition accuracy is incredible. It has completely transformed our attendance and security operations." },
                   { name: "Priya Malik", role: "HR Head, Mumbai", quote: "The alerts are instant. We've seen a 40% reduction in workplace incidents since deploying AI Monitor." },
@@ -287,8 +287,8 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-32 bg-[#020617]">
-         <div className="container mx-auto px-6 max-w-3xl">
+      <section id="faq" className="py-16 sm:py-24 md:py-32 bg-[#020617]">
+         <div className="container mx-auto px-4 sm:px-6 max-w-3xl">
             <div className="text-center space-y-4 mb-20 text-balance">
                <h2 className="text-[10px] text-[#2563EB] font-black uppercase tracking-[0.4em]">Help Center</h2>
                <h3 className="text-4xl md:text-6xl font-black text-white tracking-tighter">Frequently Asked Questions</h3>
@@ -314,8 +314,8 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Banner */}
-      <section className="py-32">
-         <div className="container mx-auto px-6">
+      <section className="py-16 sm:py-24 md:py-32">
+         <div className="container mx-auto px-4 sm:px-6">
             <div className="glass rounded-[60px] p-16 md:p-32 border border-[#2563EB]/20 relative overflow-hidden text-center space-y-10 group">
                <div className="absolute inset-0 bg-gradient-to-br from-[#2563EB]/10 to-transparent -z-10 group-hover:scale-110 transition-transform duration-[3000ms]" />
                <div className="max-w-3xl mx-auto space-y-6">
@@ -337,9 +337,9 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="py-20 bg-[#020617] border-t border-white/5">
-         <div className="container mx-auto px-6">
-            <div className="grid md:grid-cols-4 gap-20 mb-20 text-balance">
-               <div className="space-y-8 col-span-2">
+         <div className="container mx-auto px-4 sm:px-6">
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16 lg:gap-20 mb-20 text-balance">
+               <div className="space-y-8 sm:col-span-1 md:col-span-2 lg:col-span-2">
                   <Link href="/" className="flex items-center gap-3">
                      <div className="w-12 h-12 bg-[#2563EB] rounded-2xl flex items-center justify-center">
                         <Shield className="w-6 h-6 text-white" />

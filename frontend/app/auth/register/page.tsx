@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Shield, ArrowRight, Building2, User, Mail, Lock, CheckCircle2 } from 'lucide-react'
+import { Shield, ArrowRight, Building2, User, Mail, Lock, CheckCircle2, Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 export default function RegisterPage() {
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     companyName: '',
     name: '',
@@ -20,6 +21,10 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const login = useAuthStore(state => state.login)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,6 +48,18 @@ export default function RegisterPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="w-full max-w-4xl glass p-12 rounded-3xl shadow-2xl">
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="w-8 h-8 animate-spin text-[#2563EB]" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

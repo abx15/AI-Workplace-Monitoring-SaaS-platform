@@ -1,8 +1,7 @@
 import axios from 'axios'
-import { useAuthStore } from '../store/authStore'
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,11 +10,14 @@ const axiosInstance = axios.create({
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Get token from store instead of localStorage to avoid hydration issues
-    const state = useAuthStore.getState()
-    const token = state.token
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    // Only access store on client side
+    if (typeof window !== 'undefined') {
+      const { useAuthStore } = require('../store/authStore')
+      const state = useAuthStore.getState()
+      const token = state.token
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
     return config
   },
@@ -28,7 +30,8 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      const { useAuthStore } = require('../store/authStore')
       useAuthStore.getState().logout()
       window.location.href = '/auth/login'
     }

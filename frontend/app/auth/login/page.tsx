@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,8 +18,13 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { login, isLoading } = useAuthStore()
   const router = useRouter()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const {
     register,
@@ -43,6 +48,16 @@ export default function LoginPage() {
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.')
     }
+  }
+
+  if (!mounted) {
+    return (
+      <div className="w-full max-w-md glass p-8 rounded-3xl shadow-2xl animate-in fade-in zoom-in duration-300">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-[#2563EB]" />
+        </div>
+      </div>
+    )
   }
 
   return (

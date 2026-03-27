@@ -27,16 +27,16 @@ export default function Navbar() {
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4' : 'py-6'}`}>
-      <div className="container mx-auto px-6">
-        <div className={`glass rounded-[32px] px-8 py-4 flex items-center justify-between border border-white/5 shadow-2xl backdrop-blur-3xl transition-all duration-500 ${isScrolled ? 'bg-black/20 translate-y-2' : 'bg-transparent'}`}>
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className={`glass rounded-[32px] px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between border border-white/5 shadow-2xl backdrop-blur-3xl transition-all duration-500 ${isScrolled ? 'bg-black/20 translate-y-2' : 'bg-transparent'}`}>
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#2563EB] to-[#60A5FA] rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)] group-hover:scale-110 transition-transform">
-              <Shield className="w-6 h-6 text-white" />
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#2563EB] to-[#60A5FA] rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)] group-hover:scale-110 transition-transform">
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-black text-white tracking-tighter uppercase leading-none">AI Monitor</span>
-              <span className="text-[10px] text-[#2563EB] font-black uppercase tracking-[0.2em]">Workplace</span>
+              <span className="text-lg sm:text-xl font-black text-white tracking-tighter uppercase leading-none">AI Monitor</span>
+              <span className="text-[8px] sm:text-[10px] text-[#2563EB] font-black uppercase tracking-[0.2em]">Workplace</span>
             </div>
           </Link>
 
@@ -55,16 +55,16 @@ export default function Navbar() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <Link 
               href="/auth/login"
-              className="px-6 py-3 text-sm font-bold text-white hover:text-[#2563EB] transition-colors"
+              className="px-4 sm:px-6 py-3 text-sm font-bold text-white hover:text-[#2563EB] transition-colors"
             >
               Login
             </Link>
             <Link 
               href="/auth/register"
-              className="px-8 py-3 bg-[#2563EB] text-white text-sm font-black rounded-2xl hover:bg-[#1D4ED8] transition-all flex items-center gap-2 active:scale-95 shadow-[0_10px_30px_rgba(37,99,235,0.3)]"
+              className="px-6 sm:px-8 py-3 bg-[#2563EB] text-white text-sm font-black rounded-2xl hover:bg-[#1D4ED8] transition-all flex items-center gap-2 active:scale-95 shadow-[0_10px_30px_rgba(37,99,235,0.3)]"
             >
               Get Started <ArrowRight className="w-4 h-4" />
             </Link>
@@ -82,8 +82,8 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full p-6 animate-in slide-in-from-top duration-300">
-          <div className="glass p-8 rounded-[40px] flex flex-col gap-6 border border-white/10">
+        <div className="md:hidden absolute top-full left-0 w-full p-4 sm:p-6 animate-in slide-in-from-top duration-300">
+          <div className="glass p-6 sm:p-8 rounded-[40px] flex flex-col gap-6 border border-white/10">
             {navLinks.map((link) => (
               <Link 
                 key={link.name} 
