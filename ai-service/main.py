@@ -8,6 +8,7 @@ from datetime import datetime
 from routes.detection import router as detection_router
 from routes.face import router as face_router
 from routes.advanced_ai import router as advanced_ai_router
+from routes.webcam import router as webcam_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -39,6 +40,7 @@ app.add_middleware(
 app.include_router(detection_router)
 app.include_router(face_router)
 app.include_router(advanced_ai_router)
+app.include_router(webcam_router)
 
 @app.on_event("startup")
 async def startup_event():
@@ -53,6 +55,9 @@ async def startup_event():
     print("   ✅ Anomaly Detection")
     print("   ✅ Real-time Alerts")
     print("   ✅ Video Analysis")
+    print("   ✅ Live Webcam Streaming")
+    print("   ✅ Multi-Camera Support")
+    print("   ✅ Real-time WebSocket")
     print("   ✅ Stream Processing")
     print("   ✅ Object Detection")
     print("🔗 Backend URL:", os.getenv("BACKEND_URL", "http://localhost:5000"))
@@ -75,6 +80,9 @@ async def root():
             "Anomaly Detection",
             "Real-time Alerts",
             "Video Analysis",
+            "Live Webcam Streaming",
+            "Multi-Camera Support",
+            "Real-time WebSocket",
             "Stream Processing",
             "Object Detection"
         ],
@@ -83,7 +91,8 @@ async def root():
             "health": "/health",
             "detection": "/api/detection",
             "face_recognition": "/api/face",
-            "advanced_ai": "/api/advanced"
+            "advanced_ai": "/api/advanced",
+            "webcam": "/api/webcam"
         },
         "timestamp": datetime.utcnow().isoformat()
     }
