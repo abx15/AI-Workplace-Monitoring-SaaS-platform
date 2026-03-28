@@ -9,6 +9,7 @@ from routes.detection import router as detection_router
 from routes.face import router as face_router
 from routes.advanced_ai import router as advanced_ai_router
 from routes.webcam import router as webcam_router
+from routes.camera_management import router as camera_management_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -41,6 +42,7 @@ app.include_router(detection_router)
 app.include_router(face_router)
 app.include_router(advanced_ai_router)
 app.include_router(webcam_router)
+app.include_router(camera_management_router)
 
 @app.on_event("startup")
 async def startup_event():
@@ -59,6 +61,8 @@ async def startup_event():
     print("   ✅ Multi-Camera Support")
     print("   ✅ Real-time WebSocket")
     print("   ✅ Stream Processing")
+    print("   ✅ Camera Access Management")
+    print("   ✅ Permission Control")
     print("   ✅ Object Detection")
     print("🔗 Backend URL:", os.getenv("BACKEND_URL", "http://localhost:5000"))
     print("🌐 Frontend URL:", os.getenv("FRONTEND_URL", "http://localhost:3000"))
@@ -84,6 +88,8 @@ async def root():
             "Multi-Camera Support",
             "Real-time WebSocket",
             "Stream Processing",
+            "Camera Access Management",
+            "Permission Control",
             "Object Detection"
         ],
         "endpoints": {
@@ -92,7 +98,8 @@ async def root():
             "detection": "/api/detection",
             "face_recognition": "/api/face",
             "advanced_ai": "/api/advanced",
-            "webcam": "/api/webcam"
+            "webcam": "/api/webcam",
+            "cameras": "/api/cameras"
         },
         "timestamp": datetime.utcnow().isoformat()
     }

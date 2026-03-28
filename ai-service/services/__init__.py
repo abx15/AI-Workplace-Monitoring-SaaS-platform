@@ -6,3 +6,4 @@ from .anomaly_detection import AnomalyDetectionService
 from .alert_service import AlertService
 from .webcam_service import WebcamService
 from .stream_processor import StreamProcessor
+from .camera_manager import CameraManager
