@@ -1,0 +1,194 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "ai-service/**"
+      - "frontend/**"
+      - "backend/**"
+      - "database/**"
+
+jobs:
+  test-ai-service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout AI Service
+        uses: actions/checkout@v4
+        with:
+          path: ai-service
+      
+      - name: Set up Python Environment
+        run: |
+          cd ai-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run AI Service Tests
+        run: |
+          cd ai-service
+          python -m pytest tests/ -v
+          python -m flake8 services/ routes/ models/ utils/
+      
+      - name: Run AI Service Linting
+        run: |
+          cd ai-service
+          python -m flake8 services/ routes/ models/ utils/ --max-line-length=100
+      
+      - name: Build AI Service
+        run: |
+          cd ai-service
+          python -m py_compile services/ routes/ models/ utils/
+      
+      - name: Start AI Service (Test)
+        run: |
+          cd ai-service
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+          python -m pytest tests/test_api.py --tb=short
+          python -c "import requests; requests.get('http://localhost:8000/health'); print('Health check:', response.status_code)"
+          python -m uvicorn main:app --host 0.0.0 --port 8000 --stop
+      
+      - name: Upload Coverage Reports
+        uses: codecov/codecov-action@v4
+        with:
+          path: ai-service
+        if: github.ref == 'refs/heads/main'
+        with:
+          flags: --continue-on-error
+          files: coverage.xml
+          fail_ci_if_error: true
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Frontend
+        uses: actions/checkout@v4
+        with:
+          path: frontend
+      
+      - name: Setup Node.js Environment
+        run: |
+          cd frontend
+          npm ci
+          npm install --legacy-peer-deps
+      
+      - name: Run Frontend Tests
+        run: |
+          cd frontend
+          npm run test
+          npm run test:e2e
+      
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm run build
+      
+      - name: Upload Frontend Coverage
+        uses: codecov/codecov-action@v4
+        with:
+          path: frontend
+          if: github.ref == 'refs/heads/main'
+          with:
+            flags: --continue-on-error
+            files: coverage/lcov.info
+            fail_ci_if_error: true
+
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Backend
+        uses: actions/checkout@v4
+        with:
+          path: backend
+      
+      - name: Setup Node.js Environment
+        run: |
+          cd backend
+          npm ci
+          npm install --legacy-peer-deps
+      
+      - name: Run Backend Tests
+        run: |
+          cd backend
+          npm test
+          npm run test:e2e
+      
+      - name: Build Backend
+        run: |
+          cd backend
+          npm run build
+      
+      - name: Upload Backend Coverage
+        uses: codecov/codecov-action@v4
+        with:
+          path: backend
+          if: github.ref == 'refs/heads/main'
+          with:
+            flags: --continue-on-error
+            files: coverage/lcov.info
+            fail_ci_if_error: true
+
+  deploy-staging:
+    needs: test-ai-service
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: staging
+      url: https://staging-ai-workplace.vercel.app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Staging
+        run: |
+          echo "Deploying to staging environment"
+          # Add your staging deployment commands here
+          curl -X POST -H "Authorization: token ${{ secrets.STAGING_TOKEN }}" \
+               https://api.staging-ai-workplace.vercel.app/deploy
+
+  deploy-production:
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://ai-workplace.vercel.app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Production
+        run: |
+          echo "Deploying to production environment"
+          # Add your production deployment commands here
+          curl -X POST -H "Authorization: token ${{ secrets.PRODUCTION_TOKEN }}" \
+               https://api.ai-workplace.vercel.app/deploy
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run Security Scan
+        run: |
+          cd ai-service
+          pip install safety
+          safety check --json --output security-report.json
+          python -m bandit -r services/ routes/ models/ utils/ -f json -o security-report.json
+      
+      - name: Upload Security Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: security-reports/
+      
+      - name: Dependency Check
+        run: |
+          cd ai-service
+          pip-audit
+          pip-audit --r --output dependency-report.json
+          python -m pip-audit -r services/ routes/ models/ utils/ -f json -o dependency-report.json
+      
+      - name: Upload Dependency Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-report
+          path: dependency-reports/

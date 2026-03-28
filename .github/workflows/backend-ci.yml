@@ -1,0 +1,121 @@
+name: Backend CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "backend/**"
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Backend Code
+        uses: actions/checkout@v4
+        with:
+          path: backend
+      
+      - name: Setup Python Environment
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run Backend Tests
+        run: |
+          cd backend
+          python -m pytest tests/ -v
+          python -m flake8 src/ --max-line-length=100
+      
+      - name: Run Backend Linting
+        run: |
+          cd backend
+          python -m flake8 src/ --max-line-length=100
+      
+      - name: Security Scan
+        run: |
+          cd backend
+          pip install safety
+          safety check --json --output security-report.json
+          python -m bandit -r src/ --f json -o security-report.json
+      
+      - name: Type Check
+        run: |
+          cd backend
+          python -m mypy src/ --ignore-missing-imports
+      
+      - name: Build Backend
+        run: |
+          cd backend
+          npm run build
+      
+      - name: Upload Coverage Reports
+        uses: codecov/codecov-action@v4
+        with:
+          path: backend
+          if: github.ref == 'refs/heads/main'
+          with:
+            flags: --continue-on-error
+            files: coverage/lcov.info
+            fail_ci_if_error: true
+
+  security-audit:
+    needs: test-backend
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Backend Code
+        uses: actions/checkout@v4
+        with:
+          path: backend
+      
+      - name: Run Security Audit
+        run: |
+          cd backend
+          pip install auditwheel
+          pip install -r requirements.txt
+          python -m bandit -r src/ --f json -o security-report.json
+          python -m semgrep --config=security --json -o semgrep-report.json
+      
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: security-reports/
+
+  database-migration:
+    needs: test-backend
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Backend Code
+        uses: actions/checkout@v4
+        with:
+          path: backend
+      
+      - name: Run Database Migrations
+        run: |
+          cd backend
+          npm run migrate:up
+          npm run migrate:down
+      
+      - name: Seed Database
+        run: |
+          cd backend
+          npm run seed:dev
+
+  build-and-deploy:
+    needs: test-backend
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://api.ai-workplace.vercel.app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and Deploy Backend
+        run: |
+          cd backend
+          npm run build
+          echo "Deploying backend to production"
+          # Add your Railway/Render deployment commands here
+          railway up --service backend

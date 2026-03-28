@@ -1,0 +1,90 @@
+name: Frontend CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "frontend/**"
+
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Frontend Code
+        uses: actions/checkout@v4
+        with:
+          path: frontend
+      
+      - name: Setup Node.js Environment
+        run: |
+          cd frontend
+          corepack enable corepack
+          npm ci
+          npm install --legacy-peer-deps
+      
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+      
+      - name: Run Linter
+        run: |
+          cd frontend
+          npm run lint
+      
+      - name: Run Type Check
+        run: |
+          cd frontend
+          npm run type-check
+      
+      - name: Run Unit Tests
+        run: |
+          cd frontend
+          npm run test:unit
+      
+      - name: Run Integration Tests
+        run: |
+          cd frontend
+          npm run test:integration
+      
+      - name: Run E2E Tests
+        run: |
+          cd frontend
+          npm run test:e2e
+      
+      - name: Build for Production
+        run: |
+          cd frontend
+          npm run build
+      
+      - name: Generate Bundle Analysis
+        run: |
+          cd frontend
+          npx webpack-bundle-analyzer dist/static/js/*.js --mode=json > bundle-report.json
+      
+      - name: Upload Coverage Reports
+        uses: codecov/codecov-action@v4
+        with:
+          path: frontend
+          if: github.ref == 'refs/heads/main'
+          with:
+            flags: --continue-on-error
+            files: coverage/lcov.info
+            fail_ci_if_error: true
+
+  build-and-deploy:
+    needs: test-frontend
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://ai-workplace.vercel.app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and Deploy
+        run: |
+          cd frontend
+          npm run build
+          echo "Deploying to production"
+          # Add your Vercel deployment commands here
+          npx vercel --prod --confirm

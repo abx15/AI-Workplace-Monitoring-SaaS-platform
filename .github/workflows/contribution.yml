@@ -1,0 +1,281 @@
+name: Contribution Recognition
+
+on:
+  pull_request:
+    branches: [main, develop]
+  issues:
+    types: [opened, closed]
+  push:
+    branches: [main, develop]
+
+jobs:
+  analyze-contribution:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Analyze Pull Request
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Analyzing pull request from ${{ github.actor }}"
+          echo "PR Number: ${{ github.event.number }}"
+          echo "PR Title: ${{ github.event.pull_request.title }}"
+          echo "PR Description Length: ${{ github.event.pull_request.body | length }}"
+          echo "Files Changed: ${{ github.event.pull_request.changed_files | length }}"
+          
+          # Categorize contribution
+          if [[ "${{ github.event.pull_request.title }}" =~ *"fix"* ]]; then
+            echo "Category: Bug Fix"
+          elif [[ "${{ github.event.pull_request.title }}" =~ *"feature"* ]]; then
+            echo "Category: New Feature"
+          elif [[ "${{ github.event.pull_request.title }}" =~ *"docs"* ]]; then
+            echo "Category: Documentation"
+          elif [[ "${{ github.event.pull_request.title }}" =~ *"test"* ]]; then
+            echo "Category: Testing"
+          else
+            echo "Category: Enhancement"
+          fi
+      
+      - name: Analyze Issue
+        if: github.event_name == 'issues'
+        run: |
+          echo "Analyzing issue from ${{ github.actor }}"
+          echo "Issue Number: ${{ github.event.issue.number }}"
+          echo "Issue Title: ${{ github.event.issue.title }}"
+          echo "Issue Labels: ${{ github.event.issue.labels | join(', ') }}"
+          
+          # Categorize issue
+          if [[ "${{ github.event.issue.title }}" =~ *"bug"* ]]; then
+            echo "Category: Bug Report"
+          elif [[ "${{ github.event.issue.title }}" =~ *"enhancement"* ]]; then
+            echo "Category: Feature Request"
+          elif [[ "${{ github.event.issue.title }}" =~ *"documentation"* ]]; then
+            echo "Category: Documentation"
+          else
+            echo "Category: General"
+          fi
+      
+      - name: Update Contributor Stats
+        run: |
+          echo "Updating contributor statistics..."
+          
+          # Get contributor information
+          python -c "
+          import requests
+          import json
+          import datetime
+          
+          # Get contributor data from GitHub API
+          response = requests.get(
+              f'https://api.github.com/repos/abx15/AI-Workplace-Monitoring-SaaS-platform/contributors',
+              headers={'Authorization': 'token ${{ secrets.GITHUB_TOKEN }}'}
+          )
+          
+          if response.status_code == 200:
+              contributors = response.json()
+              
+              # Filter out bot accounts
+              human_contributors = [
+                  c for c in contributors 
+                  if not c.get('type') == 'Bot' and c.get('login') not in ['dependabot[bot]', 'github-actions[bot]']
+              ]
+              
+              # Sort by contributions
+              human_contributors.sort(key=lambda x: x.get('contributions', 0), reverse=True)
+              
+              # Create contributor stats
+              stats = {
+                  'total_contributors': len(human_contributors),
+                  'top_contributors': human_contributors[:10],
+                  'last_updated': datetime.datetime.utcnow().isoformat()
+              }
+              
+              print(f'Contributors: {len(human_contributors)}')
+              for i, contributor in enumerate(human_contributors[:5]):
+                  print(f'{i+1}. {contributor.get(\"login\", \"Unknown\")}: {contributor.get(\"contributions\", 0)} contributions')
+              
+              # Save stats
+              with open('contributor_stats.json', 'w') as f:
+                  json.dump(stats, f, indent=2)
+              
+              print('✅ Contributor stats updated')
+          else:
+              print('❌ Failed to fetch contributor data')
+          "
+      
+      - name: Create Contribution Badge
+        run: |
+          echo "Creating contribution badge..."
+          
+          python -c "
+          import json
+          import re
+          
+          try:
+              with open('contributor_stats.json', 'r') as f:
+                  stats = json.load(f)
+              
+              contributor_count = stats.get('total_contributors', 0)
+              badge_url = f'https://img.shields.io/badge/contributors-{contributor_count}-blue'
+              
+              print(f'Contributor badge URL: {badge_url}')
+              
+              # Update README with badge
+              with open('README.md', 'r') as f:
+                  readme_content = f.read()
+              
+              # Find and update contributor badge
+              badge_pattern = r'!\[https://img\.shields\.io/badge/contributors-\d+-blue\]'
+              new_badge = f'![https://img.shields.io/badge/contributors-{contributor_count}-blue]'
+              
+              updated_content = re.sub(badge_pattern, new_badge, readme_content)
+              
+              with open('README.md', 'w') as f:
+                  f.write(updated_content)
+              
+              print('✅ Contributor badge updated')
+              
+          except FileNotFoundError:
+              print('Contributor stats file not found')
+          "
+      
+      - name: Update README with Stats
+        run: |
+          echo "Updating README with latest statistics..."
+          
+          python -c "
+          import json
+          import re
+          from datetime import datetime
+          
+          # Get current stats
+          try:
+              with open('contributor_stats.json', 'r') as f:
+                  stats = json.load(f)
+          except:
+              stats = {'total_contributors': 0, 'last_updated': datetime.utcnow().isoformat()}
+          
+          # Update README with stats section
+          with open('README.md', 'r') as f:
+              readme_content = f.read()
+          
+          # Find or create stats section
+          stats_section = f'''
+          ## 📊 Project Statistics
+          
+          ### 📈 Community Metrics
+          - **Total Contributors**: {stats.get('total_contributors', 0)}
+          - **Last Updated**: {stats.get('last_updated', 'Unknown')}
+          - **GitHub Stars**: ![GitHub stars](https://img.shields.io/github/stars/abx15/AI-Workplace-Monitoring-SaaS-platform?style=social)
+          - **GitHub Forks**: ![GitHub forks](https://img.shields.io/github/forks/abx15/AI-Workplace-Monitoring-SaaS-platform?style=social)
+          - **License**: ![License](https://img.shields.io/github/license/abx15/AI-Workplace-Monitoring-SaaS-platform)
+          - **Last Commit**: ![GitHub last commit](https://img.shields.io/github/last-commit/abx15/AI-Workplace-Monitoring-SaaS-platform)
+          
+          ### 🏆 Top Contributors
+          '''
+          
+          # Add top contributors if available
+          try:
+              with open('contributor_stats.json', 'r') as f:
+                  stats = json.load(f)
+              
+              top_contributors = stats.get('top_contributors', [])
+              if top_contributors:
+                  stats_section += '\n'
+                  for i, contributor in enumerate(top_contributors[:5]):
+                      stats_section += f'{i+1}. **[{contributor.get(\"login\", \"Unknown\")}](https://github.com/{contributor.get(\"login\", \"unknown\")})**: {contributor.get(\"contributions\", 0)} contributions\n'
+              
+          except:
+              pass
+          
+          # Check if stats section exists
+          if '## 📊 Project Statistics' in readme_content:
+              # Update existing section
+              updated_content = re.sub(
+                  r'## 📊 Project Statistics.*?(?=\n\n## |\Z)',
+                  stats_section,
+                  readme_content,
+                  re.DOTALL
+              )
+          else:
+              # Add new section before contact section
+              contact_pos = readme_content.find('## 📞 Contact Us')
+              if contact_pos != -1:
+                  updated_content = readme_content[:contact_pos] + stats_section + '\n\n' + readme_content[contact_pos:]
+              else:
+                  updated_content = readme_content + '\n\n' + stats_section
+          
+          with open('README.md', 'w') as f:
+              f.write(updated_content)
+          
+          print('✅ README updated with project statistics')
+          "
+      
+      - name: Commit and Push Updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git add README.md contributor_stats.json
+          git commit -m "📊 Update project statistics and contributor information"
+          git push
+      
+      - name: Thank Contributor
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged
+        run: |
+          echo "Thanking contributor for merged pull request..."
+          
+          python -c "
+          import requests
+          import json
+          
+          # Get merged PR information
+          pr_number = '${{ github.event.number }}'
+          contributor = '${{ github.event.pull_request.user.login }}'
+          repo = '${{ github.repository }}'
+          
+          # Create thank you message
+          message = f'''
+          🎉 Thank you @{contributor} for your contribution to {repo}!
+          
+          Your pull request #{pr_number} has been successfully merged. 🚀
+          
+          Your contribution helps make AI Workplace Monitor better for everyone!
+          
+          We appreciate your time and effort. Keep up the great work! 💪
+          
+          Best regards,
+          The AI Workplace Monitor Team
+          '''
+          
+          print(message)
+          
+          # Post comment on PR (if enabled)
+          if '${{ secrets.GITHUB_TOKEN }}':
+              try:
+                  response = requests.post(
+                      f'https://api.github.com/repos/{repo}/issues/{pr_number}/comments',
+                      headers={
+                          'Authorization': 'token ${{ secrets.GITHUB_TOKEN }}',
+                          'Accept': 'application/vnd.github.v3+json'
+                      },
+                      json={'body': message}
+                  )
+                  
+                  if response.status_code == 201:
+                      print('✅ Thank you comment posted')
+                  else:
+                      print('❌ Failed to post comment')
+              except Exception as e:
+                  print(f'❌ Error posting comment: {e}')
+          "
+      
+      - name: Upload Contribution Data
+        uses: actions/upload-artifact@v4
+        with:
+          name: contribution-data
+          path: |
+            contributor_stats.json

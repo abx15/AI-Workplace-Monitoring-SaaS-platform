@@ -1,0 +1,151 @@
+name: Code Quality & Security
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.9'
+      
+      - name: Install Quality Tools
+        run: |
+          pip install black isort flake8 mypy bandit safety semgrep pre-commit
+      
+      - name: Check Code Formatting
+        run: |
+          black --check --diff ai-service/
+          isort --check-only ai-service/
+      
+      - name: Run Linters
+        run: |
+          flake8 ai-service/ --max-line-length=100 --count --output-format=github
+          mypy ai-service/ --ignore-missing-imports --show-error-codes
+      
+      - name: Security Scan
+        run: |
+          bandit -r ai-service/ -f json -o bandit-report.json
+          safety check --json --output safety-report.json
+          semgrep --config=security --json --output=semgrep-report.json ai-service/
+      
+      - name: Code Complexity Analysis
+        run: |
+          pip install radon
+          radon cc ai-service/ --json --output-file=radon-report.json
+      
+      - name: Upload Quality Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-quality-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+            semgrep-report.json
+            radon-report.json
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.9'
+      
+      - name: Check Dependencies
+        run: |
+          pip install pip-audit safety
+          pip-audit -r ai-service/requirements.txt --output audit-report.json
+          safety check --json --input-file=ai-service/requirements.txt --output safety-report.json
+          pip check --dry-run ai-service/requirements.txt
+      
+      - name: Upload Dependency Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-reports
+          path: |
+            audit-report.json
+            safety-report.json
+
+  frontend-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Frontend Code
+        uses: actions/checkout@v4
+        with:
+          path: frontend
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm ci
+      
+      - name: Run Linters
+        run: |
+          cd frontend
+          npm run lint
+          npm run type-check
+      
+      - name: Check Bundle Size
+        run: |
+          cd frontend
+          npm run build
+          npx webpack-bundle-analyzer dist/static/js/*.js --mode=json > bundle-report.json
+      
+      - name: Upload Frontend Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-quality-reports
+          path: |
+            bundle-report.json
+
+  backend-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Backend Code
+        uses: actions/checkout@v4
+        with:
+          path: backend
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: |
+          cd backend
+          npm ci
+      
+      - name: Run Linters
+        run: |
+          cd backend
+          npm run lint
+          npm run type-check
+      
+      - name: Upload Backend Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-quality-reports
+          path: backend/src/

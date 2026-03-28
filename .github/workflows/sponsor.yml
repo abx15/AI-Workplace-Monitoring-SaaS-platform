@@ -1,0 +1,231 @@
+name: Sponsor Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      sponsor_name:
+        description: 'Name of the sponsor'
+        required: true
+        type: string
+      sponsor_level:
+        description: 'Sponsor level (bronze, silver, gold, platinum)'
+        required: true
+        type: string
+      sponsor_message:
+        description: 'Message from sponsor'
+        required: false
+        type: string
+
+jobs:
+  update-sponsors:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.9'
+      
+      - name: Update Sponsor Information
+        run: |
+          echo "Updating sponsor information..."
+          echo "Sponsor: ${{ github.event.inputs.sponsor_name }}"
+          echo "Level: ${{ github.event.inputs.sponsor_level }}"
+          echo "Message: ${{ github.event.inputs.sponsor_message || 'No message' }}"
+          
+          # Create sponsor data
+          cat > sponsors.json << 'EOF'
+          {
+            "sponsors": [
+              {
+                "name": "${{ github.event.inputs.sponsor_name }}",
+                "level": "${{ github.event.inputs.sponsor_level }}",
+                "message": "${{ github.event.inputs.sponsor_message || 'No message' }}",
+                "date_added": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+                "github_user": "${{ github.actor }}"
+              }
+            ]
+          }
+          EOF
+      
+      - name: Update README with Sponsors
+        run: |
+          echo "Updating README with sponsor information..."
+          
+          # Add sponsors section to README
+          if ! grep -q "## 🏆 Sponsors" README.md; then
+            echo "" >> README.md
+            echo "## 🏆 Sponsors" >> README.md
+            echo "" >> README.md
+            echo "Thank you to our amazing sponsors who make this project possible!" >> README.md
+            echo "" >> README.md
+            echo "### 💎 Current Sponsors" >> README.md
+            echo "" >> README.md
+          fi
+          
+          # Update sponsors list
+          python -c "
+          import json
+          import re
+          
+          # Read current sponsors
+          try:
+              with open('sponsors.json', 'r') as f:
+                  sponsors_data = json.load(f)
+          except:
+              sponsors_data = {'sponsors': []}
+          
+          # Read README
+          with open('README.md', 'r') as f:
+              readme_content = f.read()
+          
+          # Find sponsors section
+          sponsors_section = re.search(r'## 🏆 Sponsors.*?(?=\n\n## |\Z)', readme_content, re.DOTALL)
+          
+          if sponsors_section:
+              # Update existing sponsors section
+              new_sponsors_text = '### 💎 Current Sponsors\n\n'
+              
+              for sponsor in sponsors_data['sponsors']:
+                  level_emoji = {
+                      'bronze': '🥉',
+                      'silver': '🥈', 
+                      'gold': '🥇',
+                      'platinum': '💎'
+                  }
+                  
+                  new_sponsors_text += f'{level_emoji.get(sponsor[\"level\"], \"🎉\")} **{sponsor[\"name\"]}** ({sponsor[\"level\"]})\n'
+                  if sponsor.get('message'):
+                      new_sponsors_text += f'> {sponsor[\"message\"]}\n'
+                  new_sponsors_text += '\n'
+              
+              # Replace sponsors section
+              updated_content = re.sub(
+                  r'## 🏆 Sponsors.*?(?=\n\n## |\Z)',
+                  f'## 🏆 Sponsors\n\n{new_sponsors_text}\n\n##',
+                  readme_content,
+                  re.DOTALL
+              )
+              
+              with open('README.md', 'w') as f:
+                  f.write(updated_content)
+              
+              print('✅ README updated with sponsor information')
+          "
+      
+      - name: Update Website Sponsors
+        run: |
+          echo "Updating website with sponsor information..."
+          
+          # Create sponsors page for website
+          cat > sponsors.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>AI Workplace Monitor - Sponsors</title>
+              <style>
+                  body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+                  .sponsor { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 10px 0; }
+                  .sponsor h3 { margin: 0 0 10px 0; }
+                  .sponsor .level { font-size: 14px; opacity: 0.8; margin-bottom: 5px; }
+                  .sponsor .message { font-style: italic; margin-top: 10px; }
+                  .bronze { border-left: 4px solid #cd7f32; }
+                  .silver { border-left: 4px solid #c0c0c0; }
+                  .gold { border-left: 4px solid #ffd700; }
+                  .platinum { border-left: 4px solid #e5e4e2; }
+              </style>
+          </head>
+          <body>
+              <h1>🏆 Our Sponsors</h1>
+              <p>Thank you to our amazing sponsors who support the development of AI Workplace Monitor!</p>
+              
+              <div id="sponsors-list">
+                  <!-- Sponsors will be dynamically added here -->
+                  <div class="sponsor">
+                      <h3>🥉 Become a Sponsor!</h3>
+                      <p>Your support helps us continue developing this amazing AI-powered workplace monitoring solution.</p>
+                      <a href="https://www.patreon.com/c/ArunKumarBind" style="background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                          🎉 Support on Patreon
+                      </a>
+                  </div>
+              </div>
+          </body>
+          </html>
+          EOF
+      
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git add README.md sponsors.json sponsors.html
+          git commit -m "🏆 Update sponsor information - ${{ github.event.inputs.sponsor_name }} (${{ github.event.inputs.sponsor_level }})"
+          git push
+      
+      - name: Create Sponsor Badge
+        run: |
+          echo "Creating sponsor badge..."
+          
+          # Create badge
+          python -c "
+          import json
+          
+          try:
+              with open('sponsors.json', 'r') as f:
+                  sponsors_data = json.load(f)
+          except:
+              sponsors_data = {'sponsors': []}
+          
+          sponsor_count = len(sponsors_data['sponsors'])
+          
+          badge_url = f'https://img.shields.io/badge/sponsors-{sponsor_count}-blue'
+          
+          print(f'Sponsor badge URL: {badge_url}')
+          print(f'Total sponsors: {sponsor_count}')
+          "
+      
+      - name: Update Sponsor Badge
+        run: |
+          echo "Updating sponsor badge in README..."
+          
+          # Update badge in README
+          python -c "
+          import json
+          import re
+          
+          try:
+              with open('sponsors.json', 'r') as f:
+                  sponsors_data = json.load(f)
+          except:
+              sponsors_data = {'sponsors': []}
+          
+          sponsor_count = len(sponsors_data['sponsors'])
+          
+          with open('README.md', 'r') as f:
+              readme_content = f.read()
+          
+          # Update badge
+          badge_pattern = r'!\[https://img\.shields\.io/badge/sponsors-\d+-blue\]\(https://www\.patreon\.com/c/ArunKumarBind\)'
+          new_badge = f'![https://img.shields.io/badge/sponsors-{sponsor_count}-blue](https://www.patreon.com/c/ArunKumarBind)'
+          
+          updated_content = re.sub(badge_pattern, new_badge, readme_content)
+          
+          with open('README.md', 'w') as f:
+              f.write(updated_content)
+          
+          print('✅ Sponsor badge updated')
+          "
+      
+      - name: Upload Sponsor Assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: sponsor-assets
+          path: |
+            sponsors.json
+            sponsors.html

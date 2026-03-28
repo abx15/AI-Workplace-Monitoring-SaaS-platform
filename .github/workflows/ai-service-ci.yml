@@ -1,0 +1,316 @@
+name: AI Service CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "ai-service/**"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "ai-service/**"
+
+jobs:
+  test-ai-service:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11.9]
+        os: [ubuntu-latest]
+    
+    steps:
+      - name: Checkout AI Service Code
+        uses: actions/checkout@v4
+        with:
+          path: ai-service
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('ai-service/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install Dependencies
+        run: |
+          cd ai-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov flake8 black mypy bandit safety
+      
+      - name: Run AI Service Tests
+        run: |
+          cd ai-service
+          python -m pytest tests/ -v --cov=services --cov=routes --cov=models --cov=utils --cov-report=xml --cov-report=html
+          python -m flake8 services/ routes/ models/ utils/ --max-line-length=100 --count
+          python -m mypy services/ routes/ models/ utils/ --ignore-missing-imports
+          python -m black --check services/ routes/ models/ utils/
+      
+      - name: Run Security Tests
+        run: |
+          cd ai-service
+          safety check --json --output safety-report.json
+          bandit -r services/ routes/ models/ utils/ -f json -o bandit-report.json
+          pip-audit -r --output audit-report.json
+      
+      - name: Test AI Models Loading
+        run: |
+          cd ai-service
+          python -c "
+          from services.object_detection import ObjectDetectionService
+          from services.face_recognition import FaceRecognitionService
+          from services.pose_estimation import PoseEstimationService
+          from services.emotion_detection import EmotionDetectionService
+          from services.anomaly_detection import AnomalyDetectionService
+          from services.camera_manager import CameraManager
+          
+          print('Testing AI models loading...')
+          
+          # Test object detection
+          obj_det = ObjectDetectionService()
+          obj_det.load_model()
+          print('✅ Object detection model loaded')
+          
+          # Test face recognition
+          face_rec = FaceRecognitionService()
+          face_rec.load_known_faces()
+          print('✅ Face recognition service loaded')
+          
+          # Test pose estimation
+          pose_est = PoseEstimationService()
+          pose_est.load_model()
+          print('✅ Pose estimation model loaded')
+          
+          # Test emotion detection
+          emotion_det = EmotionDetectionService()
+          emotion_det.load_model()
+          print('✅ Emotion detection model loaded')
+          
+          # Test anomaly detection
+          anomaly_det = AnomalyDetectionService()
+          print('✅ Anomaly detection service loaded')
+          
+          # Test camera manager
+          cam_mgr = CameraManager()
+          cameras = cam_mgr.scan_cameras()
+          print(f'✅ Found {len(cameras)} cameras')
+          
+          print('🎉 All AI services loaded successfully!')
+          "
+      
+      - name: Test API Endpoints
+        run: |
+          cd ai-service
+          python -m uvicorn main:app --host 0.0.0.0 --port 8001 &
+          sleep 5
+          
+          # Test health endpoint
+          python -c "
+          import requests
+          response = requests.get('http://localhost:8001/health', timeout=10)
+          print(f'Health check: {response.status_code}')
+          assert response.status_code == 200
+          "
+          
+          # Test camera management
+          python -c "
+          import requests
+          response = requests.get('http://localhost:8001/api/cameras/scan', timeout=10)
+          print(f'Camera scan: {response.status_code}')
+          assert response.status_code == 200
+          "
+          
+          # Test AI analysis
+          python -c "
+          import base64
+          import requests
+          
+          # Create test frame (small base64)
+          test_frame = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhf/KZoKTn2NQGAAABJRU5ErkJggg=='  # 1x1 pixel test image
+          
+          response = requests.post(
+              'http://localhost:8001/api/advanced/analyze/comprehensive',
+              json={
+                  'camera_id': 'test',
+                  'company_id': 'test',
+                  'frame_base64': test_frame,
+                  'confidence_threshold': 0.7,
+                  'enable_face_recognition': True,
+                  'enable_pose_estimation': True,
+                  'enable_emotion_detection': True,
+                  'enable_anomaly_detection': True
+              },
+              timeout=30
+          )
+          print(f'AI Analysis: {response.status_code}')
+          assert response.status_code == 200
+          "
+          
+          python -c "import uvicorn; uvicorn.main.stop()" 2>/dev/null || true
+      
+      - name: Upload Coverage Reports
+        uses: codecov/codecov-action@v4
+        with:
+          path: ai-service
+          if: github.ref == 'refs/heads/main'
+          with:
+            flags: --continue-on-error
+            files: coverage.xml
+            fail_ci_if_error: true
+      
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: ai-service/
+        if: github.ref == 'refs/heads/main'
+
+  build-and-deploy:
+    needs: test-ai-service
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout AI Service Code
+        uses: actions/checkout@v4
+        with:
+          path: ai-service
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.9'
+      
+      - name: Install Dependencies
+        run: |
+          cd ai-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Build AI Service
+        run: |
+          cd ai-service
+          python -m py_compile services/ routes/ models/ utils/
+      
+      - name: Deploy to Production
+        run: |
+          echo "Deploying AI Service to production"
+          # Add your Railway/Render deployment commands here
+          curl -X POST -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+               https://api.railway.app/v2/projects/$RAILWAY_PROJECT_ID/services \
+               -H "Content-Type: application/json" \
+               -d '{
+                 "serviceId": "'$RAILWAY_SERVICE_ID'",
+                 "environment": "production",
+                 "buildCommand": "pip install -r requirements.txt && python -m uvicorn main:app --host 0.0.0.0 --port $PORT",
+                 "startCommand": "python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
+               }'
+      
+      - name: Health Check After Deployment
+        run: |
+          echo "Checking deployment health..."
+          sleep 30
+          curl -f https://ai-workplace.railway.app/health || exit 1
+          echo "✅ AI Service deployed successfully!"
+
+  performance-test:
+    needs: test-ai-service
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout AI Service Code
+        uses: actions/checkout@v4
+        with:
+          path: ai-service
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.9'
+      
+      - name: Install Dependencies
+        run: |
+          cd ai-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install locust pytest-benchmark
+      
+      - name: Run Performance Tests
+        run: |
+          cd ai-service
+          
+          # Start AI service
+          python -m uvicorn main:app --host 0.0.0.0 --port 8002 &
+          sleep 10
+          
+          # Create performance test script
+          cat > performance_test.py << 'EOF'
+          import requests
+          import time
+          import base64
+          from concurrent.futures import ThreadPoolExecutor
+          
+          def test_endpoint(endpoint, data=None):
+              start_time = time.time()
+              response = requests.post(f'http://localhost:8002{endpoint}', json=data or {}, timeout=30)
+              end_time = time.time()
+              return {
+                  'endpoint': endpoint,
+                  'status_code': response.status_code,
+                  'response_time': (end_time - start_time) * 1000,
+                  'success': response.status_code == 200
+              }
+          
+          # Test frame
+          test_frame = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhf/KZoKTn2NQGAAABJRU5ErkJggg=='
+          
+          # Performance tests
+          tests = [
+              test_endpoint('/health'),
+              test_endpoint('/api/cameras/scan'),
+              test_endpoint('/api/advanced/models/status'),
+              test_endpoint('/api/face/status'),
+              test_endpoint('/api/webcam/cameras'),
+              test_endpoint('/api/advanced/analyze/comprehensive', {
+                  'camera_id': 'test',
+                  'company_id': 'test',
+                  'frame_base64': test_frame,
+                  'confidence_threshold': 0.7
+              })
+          ]
+          
+          # Run concurrent tests
+          with ThreadPoolExecutor(max_workers=10) as executor:
+              results = list(executor.map(lambda test: test, tests))
+          
+          # Analyze results
+          successful_tests = [r for r in results if r['success']]
+          avg_response_time = sum(r['response_time'] for r in successful_tests) / len(successful_tests) if successful_tests else 0
+          
+          print(f"Performance Test Results:")
+          print(f"Successful Tests: {len(successful_tests)}/{len(results)}")
+          print(f"Average Response Time: {avg_response_time:.2f}ms")
+          
+          if len(successful_tests) == len(results) and avg_response_time < 500:
+              print("✅ Performance tests passed!")
+          else:
+              print("❌ Performance tests failed!")
+              exit(1)
+          EOF
+          
+          python performance_test.py
+          
+          python -c "import uvicorn; uvicorn.main.stop()" 2>/dev/null || true
+      
+      - name: Upload Performance Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-reports
+          path: ai-service/performance_test.py
