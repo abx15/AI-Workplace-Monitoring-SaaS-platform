@@ -451,17 +451,131 @@ npm run dev
 
 ## 📜 License & Legal
 
-### **📄 License Type**
-- **Commercial License**: Proprietary software license
-- **SaaS Subscription**: Monthly/annual billing
-- **Enterprise Options**: Custom licensing agreements
-- **Trial Period**: 14-day free trial available
+### **📄 Commercial License Agreement**
+
+This software is distributed under a **COMMERCIAL LICENSE** and requires a valid subscription to use. 
+
+#### **🔒 License Terms**
+- **Proprietary Software**: All rights reserved by AI Workplace Monitor
+- **Subscription Required**: Valid subscription mandatory for operation
+- **Non-Transferable**: License is specific to your organization
+- **No Redistribution**: Cannot distribute or resell the software
+- **Source Protection**: Reverse engineering is prohibited
+
+#### **📋 Complete License Agreement**
+For full license terms and conditions, please see the [LICENSE](./LICENSE) file in this repository.
+
+### **💎 Subscription Tiers**
+
+#### **🥉 Standard Plan - $49/month**
+- **5 Camera Connections**
+- Basic AI Monitoring Features
+- Person Detection
+- Email Support
+- Mobile App Access
+- Basic Analytics Dashboard
+
+#### **🥈 Professional Plan - $149/month**
+- **20 Camera Connections**
+- Advanced AI Analytics
+- Face Recognition System
+- Emotion Analysis
+- Priority Support
+- API Access
+- Custom Reports
+- Real-time Alerts
+
+#### **🥇 Enterprise Plan - Custom Pricing**
+- **Unlimited Camera Connections**
+- Custom AI Model Integration
+- Dedicated Support Team
+- White-label Options
+- On-premise Deployment
+- SLA Guarantee
+- Advanced Analytics
+- Custom Features Development
 
 ### **⚖️ Legal Compliance**
-- **GDPR Compliant**: Full data protection compliance
-- **SOC2 Type II**: Security and availability controls
-- **ISO 27001**: Information security management
-- **Privacy Policy**: Comprehensive data privacy protection
+
+#### **🛡️ Privacy & Data Protection**
+- **GDPR Compliant**: Full EU data protection compliance
+- **SOC2 Type II**: Security and availability controls certified
+- **ISO 27001**: Information security management certified
+- **Data Encryption**: End-to-end encryption for all data
+- **Privacy by Design**: Built-in privacy protections
+
+#### **🔐 Security Standards**
+- **Enterprise-grade Security**: Bank-level security protocols
+- **Regular Audits**: Third-party security assessments
+- **Compliance Monitoring**: Continuous compliance tracking
+- **Data Residency**: Multiple data center options
+- **Access Controls**: Granular permission management
+
+#### **📋 Legal Requirements**
+- **Terms of Service**: [aiworkplace.com/terms](https://aiworkplace.com/terms)
+- **Privacy Policy**: [aiworkplace.com/privacy](https://aiworkplace.com/privacy)
+- **Cookie Policy**: [aiworkplace.com/cookies](https://aiworkplace.com/cookies)
+- **Acceptable Use**: [aiworkplace.com/acceptable-use](https://aiworkplace.com/acceptable-use)
+
+### **💰 Payment & Billing**
+
+#### **💳 Payment Methods**
+- **Credit/Debit Cards**: Visa, MasterCard, American Express
+- **Digital Wallets**: PayPal, Apple Pay, Google Pay
+- **Bank Transfers**: ACH, Wire transfers for Enterprise
+- **Purchase Orders**: Available for Enterprise customers
+- **Cryptocurrency**: Bitcoin, Ethereum (Enterprise only)
+
+#### **📊 Billing Features**
+- **Flexible Billing**: Monthly or Annual subscriptions
+- **Auto-renewal**: Automatic subscription renewal
+- **Usage Tracking**: Real-time usage monitoring
+- **Invoicing**: Detailed billing statements
+- **Expense Management**: CSV exports for accounting
+- **Tax Compliance**: Automatic tax calculation
+
+#### **🔄 Subscription Management**
+- **Easy Upgrades**: Instant plan upgrades
+- **Downgrade Protection**: Graceful plan downgrades
+- **Pause Subscription**: Temporary suspension option
+- **Cancel Anytime**: No long-term commitments
+- **Refund Policy**: 14-day money-back guarantee
+
+### **🌍 Geographic Availability**
+
+#### **🌐 Supported Regions**
+- **North America**: USA, Canada, Mexico
+- **Europe**: UK, Germany, France, Spain, Italy, Netherlands
+- **Asia Pacific**: Singapore, Japan, Australia, India
+- **Latin America**: Brazil, Argentina, Chile
+- **Middle East**: UAE, Saudi Arabia, Israel
+
+#### **🚀 Data Centers**
+- **US East**: Virginia, New York
+- **US West**: California, Oregon
+- **Europe**: Frankfurt, London, Amsterdam
+- **Asia**: Singapore, Tokyo, Mumbai
+- **Australia**: Sydney, Melbourne
+
+### **📞 Licensing Support**
+
+#### **🤝 Sales Team**
+- **Email**: sales@aiworkplace.com
+- **Phone**: +1-800-AI-WORK (Available 24/7)
+- **Live Chat**: [aiworkplace.com/chat](https://aiworkplace.com/chat)
+- **Schedule Demo**: [aiworkplace.com/demo](https://aiworkplace.com/demo)
+
+#### **📋 License Inquiries**
+- **General Questions**: info@aiworkplace.com
+- **Enterprise Sales**: enterprise@aiworkplace.com
+- **Partnership**: partners@aiworkplace.com
+- **Academic**: education@aiworkplace.com
+
+#### **📚 Resources**
+- **Documentation**: [docs.aiworkplace.com](https://docs.aiworkplace.com)
+- **API Reference**: [api.aiworkplace.com](https://api.aiworkplace.com)
+- **Knowledge Base**: [support.aiworkplace.com](https://support.aiworkplace.com)
+- **Community Forum**: [community.aiworkplace.com](https://community.aiworkplace.com)
 
 ## 🎉 Why Choose AI Workplace Monitor?
 
@@ -529,7 +643,7 @@ Choose your sponsorship level and join our amazing community of supporters!
 
 ---
 
-## �📞 Contact Us
+## �� Contact Us
 
 **🌐 Website**: [aiworkplace.com](https://aiworkplace.com)
 **📧 Email**: [info@aiworkplace.com](mailto:info@aiworkplace.com)
