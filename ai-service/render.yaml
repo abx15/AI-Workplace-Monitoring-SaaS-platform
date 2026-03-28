@@ -1,8 +1,15 @@
 services:
   - type: web
-    name: ai-service
+    name: ai-workplace-monitor
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    startCommand: "python app/main.py"
     healthCheckPath: "/health"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: AI_SERVICE_PORT
+        value: 8000
+      - key: AI_SERVICE_HOST
+        value: 0.0.0.0
