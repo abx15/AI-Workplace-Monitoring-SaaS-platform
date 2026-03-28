@@ -474,12 +474,69 @@ npm run dev
 ✅ **Cost Effective**: Reduce operational costs by 40%
 ✅ **24/7 Support**: Dedicated customer success team
 
-## 📞 Contact Us
+---
+
+## 🏆 Sponsors
+
+### 💎 Current Sponsors
+
+Thank you to our amazing sponsors who make this project possible! Your support helps us continue developing this AI-powered workplace monitoring solution.
+
+#### 🥉 Bronze Sponsors
+- Support the project with basic features
+- Help cover development costs
+- Recognition in project documentation
+
+#### 🥈 Silver Sponsors
+- Enhanced recognition and visibility
+- Priority support and feature requests
+- Advanced features access
+
+#### 🥇 Gold Sponsors
+- Premium recognition and benefits
+- Direct influence on project roadmap
+- Custom integration support
+
+#### 💎 Platinum Sponsors
+- Maximum visibility and recognition
+- Direct collaboration opportunities
+- Custom development and priority features
+
+### 🤝 Become a Sponsor
+
+Support the development of AI Workplace Monitor by becoming a sponsor! Your contribution helps us:
+
+- � **Develop New Features**: Faster AI model development
+- 🧠 **Improve AI Capabilities**: Better accuracy and performance
+- 🛡️ **Enhance Security**: Advanced security features
+- 📈 **Scale Infrastructure**: Better performance and reliability
+- 📚 **Improve Documentation**: Better guides and tutorials
+- 🎯 **Community Support**: Help more users succeed
+
+#### 🎉 Sponsorship Benefits
+
+- **🏷️ Brand Visibility**: Logo placement and recognition
+- **📊 Project Insights**: Access to development roadmap
+- **🎯 Feature Priority**: Influence on future features
+- **🤝 Direct Communication**: Direct line with developers
+- **🏆 Exclusive Access**: Beta features and early releases
+
+#### 💝 How to Sponsor
+
+**🌟 Primary Sponsorship**: [Become a Sponsor on Patreon](https://www.patreon.com/c/ArunKumarBind)
+
+Choose your sponsorship level and join our amazing community of supporters!
+
+---
+
+## �📞 Contact Us
 
 **🌐 Website**: [aiworkplace.com](https://aiworkplace.com)
 **📧 Email**: [info@aiworkplace.com](mailto:info@aiworkplace.com)
 **📱 Phone**: +1-800-AI-WORK (Available 24/7)
 **💬 Live Chat**: [aiworkplace.com/chat](https://aiworkplace.com/chat)
+
+**🏆 Sponsorship Inquiries**: [sponsor@aiworkplace.com](mailto:sponsor@aiworkplace.com)
 
 ---
 
