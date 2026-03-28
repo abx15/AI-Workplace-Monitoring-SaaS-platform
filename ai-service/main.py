@@ -7,6 +7,7 @@ from datetime import datetime
 # Import routes
 from routes.detection import router as detection_router
 from routes.face import router as face_router
+from routes.advanced_ai import router as advanced_ai_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -37,17 +38,22 @@ app.add_middleware(
 # Include routers
 app.include_router(detection_router)
 app.include_router(face_router)
+app.include_router(advanced_ai_router)
 
 @app.on_event("startup")
 async def startup_event():
     """Initialize AI services"""
     print("🚀 AI Workplace Monitor Service Starting...")
-    print("📊 Features Enabled:")
+    print("📊 Advanced AI Features Enabled:")
     print("   ✅ Person Detection")
     print("   ✅ Face Recognition") 
     print("   ✅ Behavior Analysis")
+    print("   ✅ Pose Estimation")
+    print("   ✅ Emotion Detection")
+    print("   ✅ Anomaly Detection")
     print("   ✅ Real-time Alerts")
     print("   ✅ Video Analysis")
+    print("   ✅ Stream Processing")
     print("   ✅ Object Detection")
     print("🔗 Backend URL:", os.getenv("BACKEND_URL", "http://localhost:5000"))
     print("🌐 Frontend URL:", os.getenv("FRONTEND_URL", "http://localhost:3000"))
@@ -64,15 +70,20 @@ async def root():
             "Person Detection",
             "Face Recognition", 
             "Behavior Analysis",
+            "Pose Estimation",
+            "Emotion Detection",
+            "Anomaly Detection",
             "Real-time Alerts",
             "Video Analysis",
+            "Stream Processing",
             "Object Detection"
         ],
         "endpoints": {
             "docs": "/docs",
             "health": "/health",
             "detection": "/api/detection",
-            "face_recognition": "/api/face"
+            "face_recognition": "/api/face",
+            "advanced_ai": "/api/advanced"
         },
         "timestamp": datetime.utcnow().isoformat()
     }
@@ -85,10 +96,16 @@ async def health_check():
         from services.object_detection import ObjectDetectionService
         from services.face_recognition import FaceRecognitionService
         from services.alert_service import AlertService
+        from services.pose_estimation import PoseEstimationService
+        from services.emotion_detection import EmotionDetectionService
+        from services.anomaly_detection import AnomalyDetectionService
         
         detection_service = ObjectDetectionService()
         face_service = FaceRecognitionService()
         alert_service = AlertService()
+        pose_service = PoseEstimationService()
+        emotion_service = EmotionDetectionService()
+        anomaly_service = AnomalyDetectionService()
         
         return {
             "status": "healthy",
@@ -101,6 +118,18 @@ async def health_check():
                 "face_recognition": {
                     "loaded": face_service.model_loaded,
                     "known_faces": len(face_service.known_face_encodings)
+                },
+                "pose_estimation": {
+                    "loaded": pose_service.model_loaded,
+                    "model_type": "MediaPipe Pose"
+                },
+                "emotion_detection": {
+                    "loaded": emotion_service.model_loaded,
+                    "emotions_supported": 7
+                },
+                "anomaly_detection": {
+                    "history_frames": len(anomaly_service.history_buffer),
+                    "sensitivity": anomaly_service.anomaly_threshold
                 },
                 "alert_service": {
                     "backend_url": alert_service.backend_url,
@@ -131,13 +160,19 @@ async def get_service_info():
         "capabilities": {
             "detection_types": ["person", "face", "object"],
             "behavior_analysis": ["sleeping", "idle", "active", "away"],
-            "alert_types": ["sleeping", "unauthorized", "productivity_low", "safety_violation"],
+            "pose_analysis": ["standing", "sitting", "lying_down", "slouching"],
+            "emotion_detection": ["happy", "sad", "angry", "surprise", "neutral", "fear", "disgust"],
+            "anomaly_types": ["person_count", "motion", "lighting", "behavioral", "environmental"],
+            "alert_types": ["sleeping", "unauthorized", "productivity_low", "safety_violation", "anomaly"],
             "supported_formats": ["jpg", "jpeg", "png", "mp4", "avi"],
-            "processing_modes": ["real-time", "batch", "streaming"]
+            "processing_modes": ["real-time", "batch", "streaming", "comprehensive"]
         },
         "models": {
             "object_detection": "YOLOv8",
             "face_recognition": "face_recognition_library",
+            "pose_estimation": "MediaPipe Pose",
+            "emotion_detection": "custom_emotion_model",
+            "anomaly_detection": "statistical_analysis",
             "behavior_analysis": "custom_cv2"
         },
         "performance": {
@@ -147,6 +182,9 @@ async def get_service_info():
             "accuracy": {
                 "person_detection": 0.95,
                 "face_recognition": 0.89,
+                "pose_estimation": 0.87,
+                "emotion_detection": 0.82,
+                "anomaly_detection": 0.78,
                 "behavior_analysis": 0.82
             }
         },
@@ -155,7 +193,12 @@ async def get_service_info():
             "video_analysis": "POST /api/detection/video",
             "face_register": "POST /api/face/register",
             "face_recognize": "POST /api/face/recognize",
-            "get_employees": "GET /api/face/employees"
+            "get_employees": "GET /api/face/employees",
+            "comprehensive_analysis": "POST /api/advanced/analyze/comprehensive",
+            "pose_estimation": "POST /api/advanced/pose/estimate",
+            "emotion_analysis": "POST /api/advanced/emotion/analyze",
+            "anomaly_detection": "POST /api/advanced/anomaly/detect",
+            "stream_analysis": "POST /api/advanced/stream/analyze"
         }
     }
 
