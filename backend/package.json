@@ -7,6 +7,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
+    "postinstall": "npm run build",
     "seed": "ts-node src/seed/seed.ts",
     "seed:prod": "node dist/seed/seed.js"
   },
