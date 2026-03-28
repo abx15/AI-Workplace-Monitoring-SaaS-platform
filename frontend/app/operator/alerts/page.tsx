@@ -15,8 +15,8 @@ export default function OperatorAlerts() {
   }, [fetchAlerts])
 
   const filteredAlerts = alerts.filter(alert => 
-    alert.camera_id.toLowerCase().includes(search.toLowerCase()) || 
-    alert.type.toLowerCase().includes(search.toLowerCase())
+    (alert.camera_id?.toLowerCase() || '').includes(search.toLowerCase()) || 
+    (alert.type?.toLowerCase() || '').includes(search.toLowerCase())
   )
 
   return (

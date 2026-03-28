@@ -42,4 +42,6 @@ export const useSocket = () => {
       disconnectSocket()
     }
   }, [token, user, addAlert, updateCameraStatus])
+
+  return socket
 }

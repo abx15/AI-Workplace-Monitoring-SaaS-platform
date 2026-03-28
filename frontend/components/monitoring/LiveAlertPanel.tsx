@@ -52,7 +52,7 @@ export default function LiveAlertPanel({ alerts, onClear }: LiveAlertPanelProps)
                 <Bell className="w-4 h-4 text-[#EF4444]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#F1F5F9] uppercase tracking-wider">{alert.type.replace('_', ' ')}</p>
+                <p className="text-xs font-bold text-[#F1F5F9] uppercase tracking-wider">{(alert.type || '').replace('_', ' ')}</p>
                 <p className="text-[11px] text-[#94A3B8] truncate mt-0.5">Camera {alert.camera_id} • Floor 4</p>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-[10px] text-[#2563EB] font-medium bg-[#2563EB]/10 px-2 py-0.5 rounded-full">New Detection</span>

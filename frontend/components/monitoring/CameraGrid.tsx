@@ -72,7 +72,7 @@ export default function CameraGrid({ cameras, onCameraClick }: CameraGridProps) 
 
   useEffect(() => {
     cameras.forEach(camera => {
-      if (camera.status === 'active') {
+      if (camera.status === 'active' && camera.id) {
         connectCameraWS(camera.id)
       }
     })
@@ -114,10 +114,10 @@ export default function CameraGrid({ cameras, onCameraClick }: CameraGridProps) 
       )}>
         {cameras.map((camera) => (
           <CameraCard 
-            key={camera.id} 
+            key={camera.id || ''} 
             camera={camera} 
-            annotatedFrame={annotatedFrames[camera.id]}
-            detections={detectionsMap[camera.id]}
+            annotatedFrame={camera.id ? annotatedFrames[camera.id] : undefined}
+            detections={camera.id ? detectionsMap[camera.id] : undefined}
             onClick={() => onCameraClick(camera)}
           />
         ))}
