@@ -40,8 +40,9 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         set({ isLoading: true })
         try {
-          const { data } = await axiosInstance.post('/auth/login', { email, password })
-          set({ user: data.user, token: data.token, isAuthenticated: true })
+          const response = await axiosInstance.post('/auth/login', { email, password })
+          const { user, token } = response.data.data
+          set({ user, token, isAuthenticated: true })
         } catch (error) {
           console.error('Login failed', error)
           throw error

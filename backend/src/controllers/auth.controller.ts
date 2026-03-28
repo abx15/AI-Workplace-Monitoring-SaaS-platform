@@ -48,14 +48,12 @@ export const register = async (req: Request, res: Response) => {
     const user = new User({
       name,
       email,
+      password: hashedPassword, // Save the hashed password
       employeeId,
       companyId: company._id,
       department: 'production',
       role: 'employee'
     });
-
-    // Note: In a real app, you'd store the hashed password
-    // For now, we'll skip password storage for simplicity
 
     await user.save();
 
@@ -106,15 +104,29 @@ export const register = async (req: Request, res: Response) => {
 // Login user
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, employeeId } = req.body;
+    const { email, password } = req.body;
 
-    // Find user by email and employeeId
-    const user = await User.findOne({ email, employeeId });
+    // Find user by email and include password
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
+    }
+
+    // Check password if user has one
+    if (user.password) {
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid credentials'
+        });
+      }
+    } else {
+      // For users without password, allow any password (temporary)
+      console.log('User without password detected, allowing login');
     }
 
     // Get company

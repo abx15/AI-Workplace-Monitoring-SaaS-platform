@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IUser extends Document {
   name: string;
   email: string;
+  password?: string;
   employeeId: string;
   companyId: string;
   department: string;
@@ -24,6 +25,11 @@ const UserSchema = new Schema<IUser>({
     unique: true,
     lowercase: true,
     trim: true
+  },
+  password: {
+    type: String,
+    required: false, // Optional for existing employees
+    select: false // Don't include password in queries by default
   },
   employeeId: {
     type: String,

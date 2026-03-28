@@ -4,6 +4,7 @@ import { Company } from '../models/Company';
 import { User } from '../models/User';
 import { Camera } from '../models/Camera';
 import { Alert } from '../models/Alert';
+import bcrypt from 'bcryptjs';
 
 // Apply DNS fix
 const dns = require('dns');
@@ -51,8 +52,42 @@ async function seedDatabase() {
 
     // Seed Users
     console.log('\n📍 Seeding Users...');
+    
+    // Hash passwords for admin users
+    const adminPassword = await bcrypt.hash('admin123', 12);
+    const managerPassword = await bcrypt.hash('manager123', 12);
+    
     const users = [
-      // Tech Solutions Inc. employees
+      // Admin users with passwords
+      {
+        name: 'Admin User',
+        email: 'admin@techsolutions.com',
+        password: adminPassword,
+        employeeId: 'ADMIN001',
+        companyId: createdCompanies[0]._id,
+        department: 'admin',
+        role: 'admin'
+      },
+      {
+        name: 'Sarah Johnson',
+        email: 'admin@digitalinnovations.com',
+        password: adminPassword,
+        employeeId: 'ADMIN002',
+        companyId: createdCompanies[1]._id,
+        department: 'admin',
+        role: 'admin'
+      },
+      // Manager users with passwords
+      {
+        name: 'Priya Patel',
+        email: 'manager@techsolutions.com',
+        password: managerPassword,
+        employeeId: 'MGR001',
+        companyId: createdCompanies[0]._id,
+        department: 'management',
+        role: 'manager'
+      },
+      // Regular employees (without passwords for now)
       {
         name: 'Suresh Kumar',
         email: 'suresh.kumar@techsolutions.com',
@@ -86,29 +121,12 @@ async function seedDatabase() {
         role: 'supervisor'
       },
       {
-        name: 'Priya Patel',
-        email: 'priya.patel@techsolutions.com',
-        employeeId: 'EMP005',
-        companyId: createdCompanies[0]._id,
-        department: 'hr',
-        role: 'manager'
-      },
-      // Digital Innovations Ltd. employees
-      {
         name: 'John Smith',
         email: 'john.smith@digitalinnovations.com',
         employeeId: 'DI001',
         companyId: createdCompanies[1]._id,
         department: 'it',
         role: 'employee'
-      },
-      {
-        name: 'Sarah Johnson',
-        email: 'sarah.johnson@digitalinnovations.com',
-        employeeId: 'DI002',
-        companyId: createdCompanies[1]._id,
-        department: 'management',
-        role: 'admin'
       }
     ];
 
@@ -123,38 +141,44 @@ async function seedDatabase() {
         companyId: createdCompanies[0]._id,
         name: 'Main Entrance Camera',
         location: 'Main Entrance',
-        rtspUrl: 'rtsp://camera1.techsolutions.com/stream'
+        rtspUrl: 'rtsp://camera1.techsolutions.com/stream',
+        isActive: true
       },
       {
         companyId: createdCompanies[0]._id,
         name: 'Production Floor A',
         location: 'Production Floor A',
-        rtspUrl: 'rtsp://camera2.techsolutions.com/stream'
+        rtspUrl: 'rtsp://camera2.techsolutions.com/stream',
+        isActive: true
       },
       {
         companyId: createdCompanies[0]._id,
         name: 'Production Floor B',
         location: 'Production Floor B',
-        rtspUrl: 'rtsp://camera3.techsolutions.com/stream'
+        rtspUrl: 'rtsp://camera3.techsolutions.com/stream',
+        isActive: true
       },
       {
         companyId: createdCompanies[0]._id,
         name: 'Break Room',
         location: 'Break Room',
-        rtspUrl: 'rtsp://camera4.techsolutions.com/stream'
+        rtspUrl: 'rtsp://camera4.techsolutions.com/stream',
+        isActive: true
       },
       // Digital Innovations Ltd. cameras
       {
         companyId: createdCompanies[1]._id,
         name: 'Office Entrance',
         location: 'Office Entrance',
-        rtspUrl: 'rtsp://camera1.digitalinnovations.com/stream'
+        rtspUrl: 'rtsp://camera1.digitalinnovations.com/stream',
+        isActive: true
       },
       {
         companyId: createdCompanies[1]._id,
         name: 'Server Room',
         location: 'Server Room',
-        rtspUrl: 'rtsp://camera2.digitalinnovations.com/stream'
+        rtspUrl: 'rtsp://camera2.digitalinnovations.com/stream',
+        isActive: true
       }
     ];
 

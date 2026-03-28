@@ -1,18 +1,29 @@
 export interface User {
-  id: string
+  _id: string
+  id?: string
   name: string
   email: string
-  role: 'admin' | 'operator'
-  company_id: string
+  role: 'admin' | 'manager' | 'supervisor' | 'employee' | 'operator'
+  employeeId: string
+  employee_id?: string
+  department: string
+  companyId: string
+  company_id?: string
+  password?: string
 }
 
 export interface Camera {
-  id: string
+  _id: string
+  id?: string
   name: string
-  rtsp_url: string
+  rtspUrl?: string
+  rtsp_url?: string
   location: string
   status: 'active' | 'inactive' | 'error'
-  operator_id: string
+  operatorId?: string
+  operator_id?: string
+  companyId: string
+  company_id?: string
 }
 
 export interface Employee {
@@ -26,13 +37,24 @@ export interface Employee {
 }
 
 export interface Alert {
-  id: string
-  camera_id: string
-  employee_id: string
-  type: 'sleeping' | 'idle' | 'unknown_person' | 'unauthorized'
-  screenshot_url: string
+  _id: string
+  id?: string
+  cameraId: string
+  camera_id?: string
+  employeeId: string
+  employee_id?: string
+  companyId: string
+  company_id?: string
+  alertType: 'sleeping' | 'idle' | 'unknown_person' | 'unauthorized' | 'absentee' | 'productivity'
+  type?: 'sleeping' | 'idle' | 'unknown_person' | 'unauthorized'
+  screenshotUrl?: string
+  screenshot_url?: string
   status: 'pending' | 'resolved' | 'ignored'
-  created_at: string
+  severity: 'low' | 'medium' | 'high'
+  message: string
+  metadata?: any
+  createdAt: string
+  created_at?: string
 }
 
 export interface DashboardStats {

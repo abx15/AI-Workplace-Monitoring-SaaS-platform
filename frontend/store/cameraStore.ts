@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { Camera } from '../types'
 import axiosInstance from '../lib/axios'
+import { useAuthStore } from './authStore'
 
 interface CameraState {
   cameras: Camera[]
@@ -19,20 +20,37 @@ export const useCameraStore = create<CameraState>((set) => ({
   fetchCameras: async () => {
     set({ isLoading: true })
     try {
+      const authState = useAuthStore.getState()
+      const companyId = authState.user?.companyId || authState.user?.company_id
+      
+      if (!companyId) {
+        console.warn('No companyId found in auth state')
+        set({ cameras: [] })
+        return
+      }
+      
       const { data } = await axiosInstance.get('/cameras')
-      set({ cameras: data })
+      const camerasData = data.data || data
+      set({ cameras: Array.isArray(camerasData) ? camerasData : [] })
     } catch (error) {
       console.error('Failed to fetch cameras', error)
+      set({ cameras: [] })
     } finally {
       set({ isLoading: false })
     }
   },
 
-  addCamera: async (data) => {
+  addCamera: async (cameraData) => {
     set({ isLoading: true })
     try {
-      const { data: newCamera } = await axiosInstance.post('/cameras', data)
-      set((state) => ({ cameras: [...state.cameras, newCamera] }))
+      const authState = useAuthStore.getState()
+      const companyId = authState.user?.companyId || authState.user?.company_id
+      
+      const { data: newCamera } = await axiosInstance.post('/cameras', {
+        ...cameraData,
+        companyId
+      })
+      set((state) => ({ cameras: [...state.cameras, newCamera.data || newCamera] }))
     } catch (error) {
       console.error('Failed to add camera', error)
     } finally {
@@ -43,7 +61,7 @@ export const useCameraStore = create<CameraState>((set) => ({
   deleteCamera: async (id) => {
     try {
       await axiosInstance.delete(`/cameras/${id}`)
-      set((state) => ({ cameras: state.cameras.filter((c) => c.id !== id) }))
+      set((state) => ({ cameras: state.cameras.filter((c) => c._id !== id && c.id !== id) }))
     } catch (error) {
       console.error('Failed to delete camera', error)
     }
@@ -61,7 +79,7 @@ export const useCameraStore = create<CameraState>((set) => ({
   updateCameraStatus: (cameraId, status) => {
     set((state) => ({
       cameras: state.cameras.map((c) => 
-        c.id === cameraId ? { ...c, status } : c
+        (c._id === cameraId || c.id === cameraId) ? { ...c, status } : c
       )
     }))
   },

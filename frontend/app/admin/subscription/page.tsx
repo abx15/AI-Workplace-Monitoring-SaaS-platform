@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import { Check, ShieldCheck, Zap, Globe, Clock, History, CreditCard, ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'

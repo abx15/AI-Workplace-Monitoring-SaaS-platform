@@ -26,9 +26,9 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4' : 'py-6'}`}>
+    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'py-4' : 'py-6'}`}>
       <div className="container mx-auto px-4 sm:px-6">
-        <div className={`glass rounded-[32px] px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between border border-white/5 shadow-2xl backdrop-blur-3xl transition-all duration-500 ${isScrolled ? 'bg-black/20 translate-y-2' : 'bg-transparent'}`}>
+        <div className={`glass-panel rounded-[32px] px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between border border-white/10 shadow-2xl transition-all duration-500 ${isScrolled ? 'bg-black/40 translate-y-2' : 'bg-transparent'}`}>
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#2563EB] to-[#60A5FA] rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)] group-hover:scale-110 transition-transform">
@@ -46,10 +46,10 @@ export default function Navbar() {
               <Link 
                 key={link.name} 
                 href={link.href}
-                className="text-sm font-bold text-[#94A3B8] hover:text-[#2563EB] transition-colors relative group"
+                className="text-sm font-bold text-[#94A3B8] hover:text-white transition-colors relative group"
               >
                 {link.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#2563EB] group-hover:w-full transition-all duration-300" />
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#2563EB] group-hover:w-full transition-all duration-300 glow-blue" />
               </Link>
             ))}
           </div>
@@ -58,21 +58,21 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-4">
             <Link 
               href="/auth/login"
-              className="px-4 sm:px-6 py-3 text-sm font-bold text-white hover:text-[#2563EB] transition-colors"
+              className="px-4 py-3 text-sm font-bold text-[#94A3B8] hover:text-white transition-colors"
             >
               Login
             </Link>
             <Link 
               href="/auth/register"
-              className="px-6 sm:px-8 py-3 bg-[#2563EB] text-white text-sm font-black rounded-2xl hover:bg-[#1D4ED8] transition-all flex items-center gap-2 active:scale-95 shadow-[0_10px_30px_rgba(37,99,235,0.3)]"
+              className="px-6 sm:px-8 py-2.5 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white text-sm font-black rounded-xl hover:scale-105 transition-all flex items-center gap-2 active:scale-95 shadow-[0_10px_30px_rgba(37,99,235,0.4)] hover:shadow-[0_15px_40px_rgba(37,99,235,0.6)]"
             >
-              Get Started <ArrowRight className="w-4 h-4" />
+              Start Trial <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
           {/* Mobile Toggle */}
           <button 
-            className="md:hidden p-2 text-white"
+            className="md:hidden p-2 text-[#94A3B8] hover:text-white transition-colors focus:outline-none"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X /> : <Menu />}

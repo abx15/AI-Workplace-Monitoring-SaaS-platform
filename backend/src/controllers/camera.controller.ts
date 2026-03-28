@@ -4,7 +4,14 @@ import { Camera } from '../models/Camera';
 // Get all cameras for a company
 export const getCameras = async (req: Request, res: Response) => {
   try {
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     const cameras = await Camera.find({ companyId, isActive: true })
       .select('-__v')
@@ -28,7 +35,14 @@ export const getCameras = async (req: Request, res: Response) => {
 export const getCameraById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     const camera = await Camera.findOne({ 
       _id: id, 
@@ -60,8 +74,15 @@ export const getCameraById = async (req: Request, res: Response) => {
 // Create new camera
 export const createCamera = async (req: Request, res: Response) => {
   try {
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
     const { name, location, rtspUrl } = req.body;
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     if (!name) {
       return res.status(400).json({
@@ -98,7 +119,7 @@ export const createCamera = async (req: Request, res: Response) => {
 export const updateCamera = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
     const updates = req.body;
 
     // Remove sensitive fields
@@ -137,7 +158,7 @@ export const updateCamera = async (req: Request, res: Response) => {
 export const deleteCamera = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
 
     const camera = await Camera.findOneAndUpdate(
       { _id: id, companyId, isActive: true },
@@ -170,7 +191,14 @@ export const deleteCamera = async (req: Request, res: Response) => {
 export const getCamerasByLocation = async (req: Request, res: Response) => {
   try {
     const { location } = req.params;
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     const cameras = await Camera.find({ 
       companyId, 

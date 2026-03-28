@@ -69,14 +69,14 @@ export default function RegisterPage() {
       <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#2563EB]/5 rounded-full blur-[100px] -z-10" />
 
       <div className="max-w-xl w-full">
-         <div className="glass p-10 md:p-16 rounded-[60px] border border-white/5 shadow-2xl space-y-10">
+         <div className="glass-panel p-10 md:p-14 rounded-[40px] md:rounded-[60px] border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.6)] space-y-10 animate-in fade-in zoom-in-95 duration-500">
             <div className="text-center space-y-4">
-               <Link href="/" className="inline-flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-[#2563EB] rounded-2xl flex items-center justify-center">
+               <Link href="/" className="inline-flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#2563EB] to-[#60A5FA] rounded-2xl flex items-center justify-center glow-blue">
                     <Shield className="w-6 h-6 text-white" />
                   </div>
                </Link>
-               <h1 className="text-4xl font-black text-white tracking-tighter">Create Your Account</h1>
+               <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tighter">Create Your Account</h1>
                <p className="text-[#94A3B8] font-medium leading-relaxed">Join 500+ companies securing their workspace.</p>
             </div>
 
@@ -89,7 +89,7 @@ export default function RegisterPage() {
                         <input 
                            type="text"
                            required
-                           className="w-full pl-14 pr-8 py-5 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
+                           className="w-full pl-14 pr-8 py-4 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
                            placeholder="Acme Inc."
                            value={formData.companyName}
                            onChange={e => setFormData({...formData, companyName: e.target.value})}
@@ -104,7 +104,7 @@ export default function RegisterPage() {
                         <input 
                            type="text"
                            required
-                           className="w-full pl-14 pr-8 py-5 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
+                           className="w-full pl-14 pr-8 py-4 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
                            placeholder="John Doe"
                            value={formData.name}
                            onChange={e => setFormData({...formData, name: e.target.value})}
@@ -120,7 +120,7 @@ export default function RegisterPage() {
                      <input 
                         type="email"
                         required
-                        className="w-full pl-14 pr-8 py-5 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
+                        className="w-full pl-14 pr-8 py-4 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
                         placeholder="john@company.com"
                         value={formData.email}
                         onChange={e => setFormData({...formData, email: e.target.value})}
@@ -136,7 +136,7 @@ export default function RegisterPage() {
                         <input 
                            type="password"
                            required
-                           className="w-full pl-14 pr-8 py-5 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
+                           className="w-full pl-14 pr-8 py-4 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
                            placeholder="••••••••"
                            value={formData.password}
                            onChange={e => setFormData({...formData, password: e.target.value})}
@@ -151,7 +151,7 @@ export default function RegisterPage() {
                         <input 
                            type="password"
                            required
-                           className="w-full pl-14 pr-8 py-5 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
+                           className="w-full pl-14 pr-8 py-4 bg-white/5 border border-white/5 rounded-3xl text-white placeholder:text-[#64748B] focus:bg-white/10 focus:border-[#2563EB]/50 transition-all outline-none"
                            placeholder="••••••••"
                            value={formData.confirmPassword}
                            onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
@@ -176,7 +176,7 @@ export default function RegisterPage() {
                <button 
                   type="submit"
                   disabled={loading}
-                  className="w-full py-6 bg-[#2563EB] text-white font-black rounded-3xl hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-3 active:scale-95 shadow-[0_20px_40px_rgba(37,99,235,0.3)] disabled:opacity-50"
+                  className="w-full py-5 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white font-black rounded-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 active:scale-95 shadow-[0_15px_30px_rgba(37,99,235,0.4)] disabled:opacity-50 disabled:scale-100"
                >
                   {loading ? 'Creating Account...' : 'Create Admin Account'} <ArrowRight className="w-5 h-5" />
                </button>

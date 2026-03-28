@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/homepage/Navbar'
-import { Shield, Camera, Bell, UserCheck, BarChart3, Users, Play, Check, ChevronRight, Star, ArrowRight } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { Shield, Camera, Bell, UserCheck, BarChart3, Users, Play, Check, ChevronRight, Star, ArrowRight, Zap, Target } from 'lucide-react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false)
+  const { scrollYProgress } = useScroll()
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%'])
 
   useEffect(() => {
     setMounted(true)
@@ -16,369 +18,379 @@ export default function LandingPage() {
 
   if (!mounted) return null
 
+  // Animation variants
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0 },
+  }
+
   return (
-    <div className="bg-[#020617] min-h-screen text-white overflow-hidden">
+    <div className="bg-[#020617] min-h-screen text-white overflow-hidden font-sans selection:bg-[#2563EB]/30 selection:text-white">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-20 sm:pt-32 md:pt-40 pb-16 sm:pb-24 md:pb-32 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute top-0 left-0 w-full h-full -z-10">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#2563EB]/10 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#2563EB]/10 rounded-full blur-[120px]" />
-          <div className="absolute top-0 left-0 w-full h-full opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#2563EB 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+      <section className="relative pt-32 sm:pt-40 md:pt-48 pb-16 sm:pb-24 overflow-hidden min-h-screen flex flex-col justify-center">
+        {/* Advanced Animated Background */}
+        <div className="absolute inset-0 w-full h-full -z-10 overflow-hidden">
+          <motion.div 
+            style={{ y }}
+            className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[120vw] h-[120vw] md:w-[60vw] md:h-[60vw] bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.15)_0%,transparent_60%)] opacity-70 blur-[80px]" 
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-[#2563EB]/10 border border-[#2563EB]/20 text-[#60A5FA] text-xs font-black uppercase tracking-[0.2em]"
-            >
-               <span className="flex h-2 w-2 rounded-full bg-[#2563EB] animate-ping" />
-               New Version 2.0 is Live
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            animate="show"
+            className="max-w-5xl mx-auto text-center space-y-8 sm:space-y-10"
+          >
+            <motion.div variants={fadeInUp} className="flex justify-center">
+              <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-[#1E293B]/80 border border-[#334155] shadow-lg backdrop-blur-md">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3B82F6] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#2563EB]"></span>
+                </span>
+                <span className="text-[#94A3B8] text-sm font-semibold tracking-wide">Introducing Vision AI 2.0</span>
+              </div>
             </motion.div>
 
             <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter leading-[0.95] text-white"
+              variants={fadeInUp}
+              className="text-5xl sm:text-6xl md:text-8xl lg:text-[7rem] font-black tracking-tighter leading-[1.05] text-white"
             >
-              AI-Powered <br />
-              <span className="bg-gradient-to-r from-[#2563EB] to-[#60A5FA] bg-clip-text text-transparent">Workplace Intelligence</span>
+              Ultimate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2563EB] via-[#60A5FA] to-[#93C5FD] glow-text">Workplace</span> <br className="hidden sm:block" /> Intelligence.
             </motion.h1>
 
             <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-lg sm:text-xl md:text-xl text-[#94A3B8] max-w-2xl mx-auto font-medium"
+              variants={fadeInUp}
+              className="text-lg sm:text-xl md:text-2xl text-[#94A3B8] max-w-3xl mx-auto font-medium leading-relaxed"
             >
-              Monitor your workforce in real-time with advanced face recognition, 
-              behavior analysis, and instant smart alerts.
+              Transform your security operations with real-time neural face recognition, behavioral analysis, and automated instant alerts.
             </motion.p>
 
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex flex-col md:flex-row items-center justify-center gap-6 pt-8"
+              variants={fadeInUp}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-8"
             >
               <Link 
                 href="/auth/register"
-                className="w-full md:w-auto px-12 py-6 bg-[#2563EB] text-white text-lg font-black rounded-3xl hover:bg-[#1D4ED8] transition-all flex items-center justify-center gap-3 active:scale-95 shadow-[0_20px_40px_rgba(37,99,235,0.3)]"
+                className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white text-lg font-black rounded-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(37,99,235,0.4)] hover:shadow-[0_0_60px_rgba(37,99,235,0.6)]"
               >
                 Start Free Trial <ArrowRight className="w-5 h-5" />
               </Link>
               <button 
-                className="w-full md:w-auto px-12 py-6 glass text-white text-lg font-bold rounded-3xl border border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
+                className="w-full sm:w-auto px-10 py-5 glass-panel text-white text-lg font-bold rounded-2xl hover:bg-white/5 transition-all flex items-center justify-center gap-3 group"
               >
-                <Play className="w-5 h-5 fill-white" /> Watch Demo
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-[#2563EB] transition-colors">
+                  <Play className="w-4 h-4 fill-white translate-x-0.5" />
+                </div>
+                Watch Demo
               </button>
             </motion.div>
-
-            {/* Stats Row */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 pt-20 border-t border-white/5"
-            >
-              {[
-                { label: '500+', sub: 'Companies' },
-                { label: '1M+', sub: 'Events Tracked' },
-                { label: '99.9%', sub: 'Uptime' },
-                { label: '10K+', sub: 'Cameras' },
-              ].map((stat, i) => (
-                <div key={i} className="text-center group">
-                  <div className="text-2xl sm:text-3xl md:text-3xl font-black text-white group-hover:text-[#2563EB] transition-colors">{stat.label}</div>
-                  <div className="text-[8px] sm:text-[10px] md:text-[10px] text-[#64748B] font-black uppercase tracking-widest">{stat.sub}</div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Hero Mockup */}
-      <section className="pb-32 relative">
+      {/* Hero Mockup Dashboard */}
+      <section className="pb-20 sm:pb-32 relative z-20 -mt-10 sm:-mt-20">
          <div className="container mx-auto px-4 sm:px-6">
             <motion.div 
-              initial={{ opacity: 0, y: 100 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="relative p-2 glass rounded-[40px] border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.5)] overflow-hidden"
+              initial={{ opacity: 0, y: 100, rotateX: 10 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1, type: 'spring', bounce: 0.3 }}
+              style={{ perspective: 2000 }}
+              className="relative p-2 sm:p-4 glass-panel rounded-[24px] sm:rounded-[40px] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden mx-auto max-w-6xl border border-white/10"
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent z-10" />
-              <div className="bg-[#0F172A] rounded-[38px] aspect-[16/9] flex items-center justify-center overflow-hidden">
-                 <div className="w-full h-full bg-[#1E293B]/50 animate-pulse relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                       <Shield className="w-20 h-20 text-[#2563EB]/20" />
+              <div className="bg-[#020617] rounded-[20px] sm:rounded-[36px] aspect-[16/10] sm:aspect-[16/9] flex flex-col overflow-hidden border border-white/5 relative">
+                {/* Fake Browser Toolbar */}
+                <div className="h-12 border-b border-white/5 bg-[#0F172A] flex items-center px-6 gap-3">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#EF4444]/80"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#F59E0B]/80"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#22C55E]/80"></div>
+                  </div>
+                  <div className="h-6 w-64 bg-[#1E293B] rounded-md mx-auto hidden sm:block"></div>
+                </div>
+                {/* Fake Dashboard Content */}
+                <div className="flex-1 p-4 sm:p-8 flex gap-6 bg-[url('/noise.png')] bg-repeat opacity-90">
+                  <div className="w-64 hidden lg:block space-y-4">
+                    <div className="h-10 w-full bg-[#1E293B] rounded-xl animate-pulse"></div>
+                    <div className="h-8 w-3/4 bg-white/5 rounded-xl"></div>
+                    <div className="h-8 w-5/6 bg-white/5 rounded-xl"></div>
+                  </div>
+                  <div className="flex-1 space-y-6">
+                    <div className="flex gap-4">
+                      <div className="h-32 flex-1 glass rounded-2xl flex items-center justify-center">
+                         <Camera className="w-10 h-10 text-[#2563EB]/40" />
+                      </div>
+                      <div className="h-32 flex-1 glass rounded-2xl hidden md:flex items-center justify-center">
+                         <Users className="w-10 h-10 text-[#22C55E]/40" />
+                      </div>
+                      <div className="h-32 flex-1 glass rounded-2xl hidden sm:flex items-center justify-center">
+                         <BarChart3 className="w-10 h-10 text-[#F59E0B]/40" />
+                      </div>
                     </div>
-                 </div>
+                    <div className="h-[40vh] w-full glass rounded-3xl border border-[#2563EB]/20 relative overflow-hidden">
+                       <div className="absolute inset-0 bg-gradient-to-t from-[#2563EB]/10 to-transparent"></div>
+                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                          <Target className="w-24 h-24 text-[#2563EB]/30 animate-ping duration-[3000ms]" />
+                       </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
          </div>
       </section>
 
-      {/* How it Works */}
-      <section id="how-it-works" className="py-16 sm:py-24 md:py-32 bg-[#020617] relative">
-         <div className="container mx-auto px-4 sm:px-6">
-            <div className="max-w-xl mx-auto text-center space-y-4 mb-20">
-               <h2 className="text-[10px] text-[#2563EB] font-black uppercase tracking-[0.4em]">The Process</h2>
-               <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter">Your Setup in Seconds</h3>
-            </div>
-
-            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-               {[
-                 { icon: Camera, title: "Connect Cameras", desc: "Easily integrate any IP/RTSP camera using our simple dashboard in seconds." },
-                 { icon: Shield, title: "AI Analysis", desc: "Our neural networks process data instantly for face recognition & behavior." },
-                 { icon: Bell, title: "Smart Alerts", desc: "Get real-time push notifications the moment an incident is detected." },
-               ].map((step, i) => (
-                 <div key={i} className="relative group p-6 sm:p-8 lg:p-10 glass rounded-[40px] border border-white/5 hover:border-[#2563EB]/30 transition-all">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2563EB]/10 rounded-3xl flex items-center justify-center mb-6 sm:mb-8 border border-[#2563EB]/20 group-hover:scale-110 transition-transform">
-                       <step.icon className="w-6 h-6 sm:w-8 sm:h-8 text-[#2563EB]" />
-                    </div>
-                    <div className="text-2xl sm:text-2xl lg:text-3xl font-black text-white mb-4 tracking-tight">{step.title}</div>
-                    <p className="text-sm sm:text-base text-[#94A3B8] font-medium leading-relaxed">{step.desc}</p>
-                    <div className="absolute bottom-10 right-10 text-8xl font-black text-white opacity-[0.02] tracking-tighter">{i+1}</div>
-                 </div>
-               ))}
-            </div>
-         </div>
+      {/* Stats Section */}
+      <section className="py-10 border-y border-white/5 bg-[#0F172A]/30">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/5">
+            {[
+              { num: "99.9%", label: "Accuracy Rate" },
+              { num: "10ms", label: "Latency Insight" },
+              { num: "500+", label: "Enterprise Clients" },
+              { num: "24/7", label: "Active Monitoring" },
+            ].map((stat, i) => (
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-3xl sm:text-4xl md:text-5xl font-black text-white">{stat.num}</div>
+                <div className="text-xs sm:text-sm text-[#64748B] font-bold uppercase tracking-widest mt-2">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* Features Grid */}
-      <section id="features" className="py-16 sm:py-24 md:py-32 relative overflow-hidden">
-         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-[#2563EB]/5 rounded-full blur-[200px] -z-10" />
-         
+      {/* Bento Grid Features */}
+      <section id="features" className="py-20 sm:py-32 relative">
          <div className="container mx-auto px-4 sm:px-6">
-            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-20 items-center">
-               <div className="space-y-10">
-                  <div className="space-y-4">
-                     <h2 className="text-[10px] text-[#2563EB] font-black uppercase tracking-[0.4em]">Core Capabilities</h2>
-                     <h3 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95]">Powerful Features <br />For Modern Teams</h3>
-                  </div>
-                  
-                  <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                     {[
-                       { icon: UserCheck, title: "Face Recognition", desc: "Identity tracking with 99.9% accuracy" },
-                       { icon: BarChart3, title: "Live Analytics", desc: "Real-time workforce data visualizer" },
-                       { icon: Bell, title: "Smart Alerts", desc: "AI-powered behavioral incident detection" },
-                       { icon: Users, title: "Role Management", desc: "Granular access for Admin and Operators" },
-                       { icon: Camera, title: "Multi-Camera", desc: "Monitor unlimited locations simultaneously" },
-                       { icon: Shield, title: "Privacy First", desc: "GDPR compliant data handling and storage" },
-                     ].map((item, i) => (
-                        <div key={i} className="flex flex-col gap-4 p-6 glass rounded-3xl border border-white/5 hover:bg-white/5 transition-all cursor-default">
-                           <item.icon className="w-8 h-8 text-[#2563EB]" />
-                           <div className="font-black text-white tracking-tight">{item.title}</div>
-                           <p className="text-xs text-[#64748B] font-medium">{item.desc}</p>
-                        </div>
-                     ))}
-                  </div>
-               </div>
-
-               <div className="relative">
-                  <div className="glass rounded-[50px] p-8 border border-white/10 shadow-2xl">
-                     <div className="bg-[#020617] rounded-[42px] overflow-hidden border border-white/5">
-                        {/* Fake Dashboard View */}
-                        <div className="p-8 space-y-8 animate-in fade-in zoom-in duration-1000">
-                           <div className="flex justify-between">
-                              <div className="h-6 w-32 bg-white/5 rounded-full" />
-                              <div className="h-6 w-20 bg-[#2563EB]/20 rounded-full" />
-                           </div>
-                           <div className="grid grid-cols-3 gap-4">
-                              {[1, 2, 3].map(j => (
-                                 <div key={j} className="h-32 bg-white/5 rounded-3xl border border-white/5 border-dashed" />
-                              ))}
-                           </div>
-                           <div className="space-y-4">
-                              <div className="h-4 w-full bg-white/5 rounded-full" />
-                              <div className="h-4 w-full bg-white/5 rounded-full" />
-                              <div className="h-4 w-2/3 bg-white/5 rounded-full" />
-                           </div>
+            <div className="max-w-3xl mb-16 sm:mb-24">
+               <h2 className="text-[#2563EB] text-sm font-black uppercase tracking-[0.3em] mb-4">Powerful Arsenal</h2>
+               <h3 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter leading-tight">Everything you need to <br className="hidden md:block"/>secure your workforce.</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[280px]">
+               {/* Large Feature 1 */}
+               <motion.div 
+                 initial={{ opacity: 0, y: 20 }}
+                 whileInView={{ opacity: 1, y: 0 }}
+                 viewport={{ once: true }}
+                 className="md:col-span-2 lg:col-span-2 row-span-2 glass-panel rounded-[32px] p-8 sm:p-12 relative overflow-hidden group hover:border-[#2563EB]/50 transition-colors"
+               >
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#2563EB]/20 rounded-full blur-[80px] group-hover:bg-[#2563EB]/30 transition-colors"></div>
+                  <UserCheck className="w-16 h-16 text-[#60A5FA] mb-8" />
+                  <h4 className="text-3xl font-black mb-4">Neural Face Recognition</h4>
+                  <p className="text-[#94A3B8] text-lg font-medium max-w-md">Industry-leading facial mapping technology that identifies personnel in under 10 milliseconds, even in low light or crowded environments.</p>
+                  <div className="mt-12 w-full h-48 bg-[#0F172A] rounded-2xl border border-white/5 relative overflow-hidden">
+                     <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20"></div>
+                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-xl border-2 border-[#22C55E] flex items-center justify-center bg-[#22C55E]/10 glow-blue">
+                           <Check className="text-[#22C55E]" />
                         </div>
                      </div>
                   </div>
-               </div>
+               </motion.div>
+
+               {/* Smaller Feature 2 */}
+               <motion.div 
+                 initial={{ opacity: 0, y: 20 }}
+                 whileInView={{ opacity: 1, y: 0 }}
+                 viewport={{ once: true }}
+                 transition={{ delay: 0.1 }}
+                 className="md:col-span-1 lg:col-span-2 glass rounded-[32px] p-8 relative overflow-hidden group hover:border-white/20 transition-colors"
+               >
+                  <Bell className="w-12 h-12 text-[#F59E0B] mb-6" />
+                  <h4 className="text-2xl font-black mb-3">Instant Smart Alerts</h4>
+                  <p className="text-[#94A3B8] font-medium">Get notified immediately on Telegram, WhatsApp, or SMS when unauthorized access or specific behaviors are detected.</p>
+               </motion.div>
+
+               {/* Smaller Feature 3 */}
+               <motion.div 
+                 initial={{ opacity: 0, y: 20 }}
+                 whileInView={{ opacity: 1, y: 0 }}
+                 viewport={{ once: true }}
+                 transition={{ delay: 0.2 }}
+                 className="md:col-span-1 lg:col-span-1 glass rounded-[32px] p-8 relative overflow-hidden group hover:border-white/20 transition-colors"
+               >
+                  <Zap className="w-12 h-12 text-[#8B5CF6] mb-6" />
+                  <h4 className="text-2xl font-black mb-3">Zero Latency</h4>
+                  <p className="text-[#94A3B8] font-medium text-sm">Edge-optimized models ensure your stream is parsed locally instantly.</p>
+               </motion.div>
+
+               {/* Smaller Feature 4 */}
+               <motion.div 
+                 initial={{ opacity: 0, y: 20 }}
+                 whileInView={{ opacity: 1, y: 0 }}
+                 viewport={{ once: true }}
+                 transition={{ delay: 0.3 }}
+                 className="md:col-span-1 lg:col-span-1 glass rounded-[32px] p-8 relative overflow-hidden group hover:border-white/20 transition-colors"
+               >
+                  <Camera className="w-12 h-12 text-[#EC4899] mb-6" />
+                  <h4 className="text-2xl font-black mb-3">Global RTSP Integration</h4>
+                  <p className="text-[#94A3B8] font-medium text-sm">Connects seamlessly with any existing IP camera setup worldwide.</p>
+               </motion.div>
             </div>
          </div>
       </section>
 
-      {/* Pricing Section (Simplified from subscription page) */}
-      <section id="pricing" className="py-16 sm:py-24 md:py-32 bg-[#020617]">
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 sm:py-32 bg-[#0F172A]/50 border-y border-white/5 relative overflow-hidden">
+         <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-[#2563EB]/5 rounded-full blur-[150px] -z-10" />
          <div className="container mx-auto px-4 sm:px-6">
-            <div className="text-center max-w-2xl mx-auto space-y-6 mb-20">
-               <h2 className="text-[10px] text-[#2563EB] font-black uppercase tracking-[0.4em]">Pricing Plans</h2>
-               <h3 className="text-4xl md:text-6xl font-black tracking-tighter">Scalable Plans for Everyone</h3>
-               <p className="text-[#94A3B8] font-medium text-lg">Choose the perfect plan to grow your business.</p>
+            <div className="text-center max-w-3xl mx-auto space-y-6 mb-20">
+               <h2 className="text-sm text-[#2563EB] font-black uppercase tracking-[0.3em]">Plans & Pricing</h2>
+               <h3 className="text-4xl md:text-6xl font-black tracking-tighter">Scale with confidence.</h3>
             </div>
 
-            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+            <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto items-center">
                {[
-                  { name: "Basic", price: "999", cameras: "2", features: ["Real-time Monitoring", "7 Days History", "Email Notifications", "Standard Support"] },
-                  { name: "Pro", price: "2,999", cameras: "10", features: ["Advanced Face Recognition", "30 Days History", "SMS & WhatsApp Alerts", "Dedicated Support", "Analytics Dashboard"], popular: true },
-                  { name: "Enterprise", price: "Custom", cameras: "Unlimited", features: ["Custom AI Training", "On-Premise Deployment", "Unlimited History", "24/7 Priority Support", "White Label Options"] },
+                  { name: "Starter", price: "4,999", duration: "mo", desc: "Perfect for small retail shops and single-location offices.", features: ["Up to 5 Cameras", "7 Days Cloud History", "Standard AI Models", "Email Alerts"] },
+                  { name: "Professional", price: "12,999", duration: "mo", popular: true, desc: "For growing businesses requiring advanced behavioral analytics and fast alerts.", features: ["Up to 25 Cameras", "30 Days Cloud History", "Premium Facial Recognition", "WhatsApp/SMS Alerts", "Priority Support", "Custom Blacklists"] },
+                  { name: "Enterprise", price: "Custom", duration: "yr", desc: "Unlimited scale for multi-city corporate environments.", features: ["Unlimited Cameras", "On-Premise Deployment", "Custom Model Training", "Dedicated Success Manager", "API Access"] },
                ].map((plan, i) => (
-                  <div key={i} className={`relative p-1 glass rounded-[40px] border ${plan.popular ? 'border-[#2563EB]' : 'border-white/5'} transition-all hover:translate-y-[-10px]`}>
+                  <motion.div 
+                     key={i} 
+                     initial={{ opacity: 0, y: 30 }}
+                     whileInView={{ opacity: 1, y: 0 }}
+                     viewport={{ once: true }}
+                     transition={{ delay: i * 0.1 }}
+                     className={`relative rounded-[40px] ${plan.popular ? 'p-1 bg-gradient-to-b from-[#2563EB] to-[#0F172A] shadow-[0_20px_60px_rgba(37,99,235,0.2)] scale-100 md:scale-105 z-10' : 'p-px bg-white/10 scale-100'}`}
+                  >
                      {plan.popular && (
-                        <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-6 py-2 bg-[#2563EB] text-white text-[10px] font-black uppercase tracking-widest rounded-full">Most Popular</div>
+                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#2563EB] text-white text-xs font-black uppercase tracking-widest rounded-full glow-blue">Most Popular</div>
                      )}
-                     <div className="p-10 space-y-8 flex flex-col h-full">
-                        <div className="space-y-2">
-                           <div className="text-xl font-black text-white">{plan.name}</div>
-                           <div className="flex items-baseline gap-1">
-                              <span className="text-4xl font-black text-white">₹{plan.price}</span>
-                              {plan.price !== 'Custom' && <span className="text-[#64748B] font-bold">/mo</span>}
-                           </div>
+                     <div className="bg-[#020617] rounded-[38px] p-8 sm:p-10 h-full flex flex-col relative overflow-hidden">
+                        {plan.popular && <div className="absolute top-0 right-0 w-32 h-32 bg-[#2563EB]/10 rounded-full blur-[40px]"></div>}
+                        
+                        <h4 className="text-2xl font-black text-white mb-2">{plan.name}</h4>
+                        <p className="text-[#94A3B8] text-sm font-medium mb-8 h-10">{plan.desc}</p>
+                        
+                        <div className="flex items-baseline gap-1 mb-8">
+                           {plan.price !== 'Custom' && <span className="text-2xl font-bold text-[#64748B]">₹</span>}
+                           <span className="text-5xl font-black text-white">{plan.price}</span>
+                           <span className="text-lg font-bold text-[#64748B]">/{plan.duration}</span>
                         </div>
 
-                        <div className="space-y-4 flex-grow">
-                           <div className="text-xs font-black uppercase tracking-widest text-[#2563EB]">{plan.cameras} Cameras Supported</div>
-                           <div className="space-y-3">
-                              {plan.features.map((feat, k) => (
-                                 <div key={k} className="flex items-center gap-3 text-sm text-[#94A3B8] font-medium">
-                                    <Check className="w-4 h-4 text-[#2563EB]" /> {feat}
+                        <ul className="space-y-4 mb-12 flex-grow">
+                           {plan.features.map((feat, k) => (
+                              <li key={k} className="flex items-start gap-3 text-sm text-[#F1F5F9] font-medium">
+                                 <div className="w-5 h-5 rounded-full bg-[#2563EB]/20 flex items-center justify-center shrink-0 mt-0.5">
+                                    <Check className="w-3 h-3 text-[#60A5FA]" />
                                  </div>
-                              ))}
-                           </div>
-                        </div>
+                                 {feat}
+                              </li>
+                           ))}
+                        </ul>
 
                         <Link 
                            href="/auth/register"
-                           className={`w-full py-5 rounded-2xl font-black text-center transition-all ${plan.popular ? 'bg-[#2563EB] text-white shadow-[0_15px_30px_rgba(37,99,235,0.3)]' : 'bg-white/5 text-white hover:bg-white/10 border border-white/5'}`}
+                           className={`w-full py-5 rounded-2xl font-black text-center transition-all ${plan.popular ? 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white' : 'glass hover:bg-white/10 text-white border-white/10'}`}
                         >
-                           Get Started
+                           {plan.price === 'Custom' ? 'Contact Sales' : 'Start Free Trial'}
                         </Link>
                      </div>
-                  </div>
-               ))}
-            </div>
-         </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-16 sm:py-24 md:py-32 bg-[#020617] border-t border-white/5">
-         <div className="container mx-auto px-4 sm:px-6">
-            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-               {[
-                  { name: "Rahul Sharma", role: "Factory Manager, Delhi", quote: "The face recognition accuracy is incredible. It has completely transformed our attendance and security operations." },
-                  { name: "Priya Malik", role: "HR Head, Mumbai", quote: "The alerts are instant. We've seen a 40% reduction in workplace incidents since deploying AI Monitor." },
-                  { name: "Amit Varma", role: "Ops Director, Bangalore", quote: "Scalable and reliable. Monitoring 50+ locations from a single dashboard has never been easier." },
-               ].map((t, i) => (
-                  <div key={i} className="p-10 glass rounded-[40px] border border-white/5 space-y-6">
-                     <div className="flex gap-1 text-[#FBBF24]">
-                        {[1, 2, 3, 4, 5].map(s => <Star key={s} className="w-4 h-4 fill-current" />)}
-                     </div>
-                     <p className="text-lg font-medium text-white leading-relaxed italic">"{t.quote}"</p>
-                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#60A5FA]" />
-                        <div>
-                           <div className="font-black text-white">{t.name}</div>
-                           <div className="text-xs text-[#64748B] font-bold uppercase tracking-wider">{t.role}</div>
-                        </div>
-                     </div>
-                  </div>
-               ))}
-            </div>
-         </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="py-16 sm:py-24 md:py-32 bg-[#020617]">
-         <div className="container mx-auto px-4 sm:px-6 max-w-3xl">
-            <div className="text-center space-y-4 mb-20 text-balance">
-               <h2 className="text-[10px] text-[#2563EB] font-black uppercase tracking-[0.4em]">Help Center</h2>
-               <h3 className="text-4xl md:text-6xl font-black text-white tracking-tighter">Frequently Asked Questions</h3>
-            </div>
-
-            <div className="space-y-6">
-               {[
-                 { q: "How does face recognition work?", a: "We use state-of-the-art neural networks to create unique facial embeddings that are matched against your company database in real-time." },
-                 { q: "Is my data secure?", a: "Yes, all data is encrypted at rest and in transit. We follow GDPR guidelines and ensure your workplace privacy is always protected." },
-                 { q: "Can I add multiple locations?", a: "Absolutely. Our platform is designed to handle unlimited locations and cameras from a single centralized dashboard." },
-                 { q: "What cameras are supported?", a: "We support any IP camera that provides an RTSP or HTTP stream. Our system is compatible with 99% of modern hardware." },
-               ].map((item, i) => (
-                  <div key={i} className="p-8 glass rounded-3xl border border-white/5 space-y-4 group hover:bg-white/5 transition-all">
-                     <div className="flex justify-between items-center cursor-pointer">
-                        <div className="text-lg font-black text-white leading-tight">{item.q}</div>
-                        <ChevronRight className="w-5 h-5 text-[#2563EB] group-hover:rotate-90 transition-transform" />
-                     </div>
-                     <p className="text-[#94A3B8] font-medium leading-relaxed">{item.a}</p>
-                  </div>
+                  </motion.div>
                ))}
             </div>
          </div>
       </section>
 
       {/* CTA Banner */}
-      <section className="py-16 sm:py-24 md:py-32">
+      <section className="py-20 sm:py-32 relative">
          <div className="container mx-auto px-4 sm:px-6">
-            <div className="glass rounded-[60px] p-16 md:p-32 border border-[#2563EB]/20 relative overflow-hidden text-center space-y-10 group">
-               <div className="absolute inset-0 bg-gradient-to-br from-[#2563EB]/10 to-transparent -z-10 group-hover:scale-110 transition-transform duration-[3000ms]" />
-               <div className="max-w-3xl mx-auto space-y-6">
-                  <h2 className="text-5xl md:text-8xl font-black tracking-tighter leading-none">Ready to Transform Your Workplace?</h2>
-                  <p className="text-xl text-[#94A3B8] font-medium">Start your 14-day free trial today. No credit card required.</p>
-               </div>
-               <div className="flex flex-col items-center gap-6">
+            <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               whileInView={{ opacity: 1, scale: 1 }}
+               viewport={{ once: true }}
+               className="glass-panel rounded-[40px] sm:rounded-[60px] p-10 sm:p-20 border border-[#2563EB]/30 relative overflow-hidden text-center group"
+            >
+               <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay"></div>
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[400px] bg-[#2563EB]/20 rounded-full blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-1000" />
+               
+               <h2 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter mb-6 relative z-10">Stop watching.<br className="hidden sm:block"/>Start knowing.</h2>
+               <p className="text-lg sm:text-xl text-[#94A3B8] font-medium max-w-2xl mx-auto mb-12 relative z-10">Deploy state-of-the-art vision AI across your entire facility network in less than 5 minutes.</p>
+               
+               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative z-10">
                   <Link 
                      href="/auth/register"
-                     className="px-16 py-8 bg-[#2563EB] text-white text-xl font-black rounded-3xl hover:bg-[#1D4ED8] transition-all active:scale-95 shadow-[0_25px_60px_rgba(37,99,235,0.4)]"
+                     className="w-full sm:w-auto px-12 py-6 bg-white text-[#0F172A] text-xl font-black rounded-2xl hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.3)]"
                   >
-                     Start Free 14-Day Trial
+                     Create Account Now
                   </Link>
-                  <div className="text-[10px] text-[#64748B] font-black uppercase tracking-widest">Available for iOS, Android, and Web</div>
                </div>
-            </div>
+            </motion.div>
          </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-20 bg-[#020617] border-t border-white/5">
-         <div className="container mx-auto px-4 sm:px-6">
-            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16 lg:gap-20 mb-20 text-balance">
-               <div className="space-y-8 sm:col-span-1 md:col-span-2 lg:col-span-2">
-                  <Link href="/" className="flex items-center gap-3">
-                     <div className="w-12 h-12 bg-[#2563EB] rounded-2xl flex items-center justify-center">
-                        <Shield className="w-6 h-6 text-white" />
+      <footer className="py-16 sm:py-24 bg-[#020617] border-t border-white/5 relative overflow-hidden">
+         <div className="container mx-auto px-4 sm:px-6 relative z-10">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-16">
+               <div className="max-w-xs">
+                  <Link href="/" className="flex items-center gap-3 mb-6">
+                     <div className="w-10 h-10 bg-[#2563EB] rounded-xl flex items-center justify-center glow-blue">
+                        <Shield className="w-5 h-5 text-white" />
                      </div>
-                     <span className="text-2xl font-black tracking-tighter uppercase">AI Monitor</span>
+                     <span className="text-xl font-black tracking-tighter uppercase">AI Monitor</span>
                   </Link>
-                  <p className="text-[#94A3B8] font-medium text-lg leading-relaxed max-w-sm">
-                     The world's most advanced AI workplace monitoring platform. 
-                     Securing 500+ companies globally.
+                  <p className="text-[#64748B] font-medium text-sm leading-relaxed">
+                     Empowering modern enterprises with actionable visual intelligence and robust security automation.
                   </p>
                </div>
                
-               <div className="space-y-8">
-                  <div className="text-[10px] text-white font-black uppercase tracking-[0.4em]">Company</div>
-                  <ul className="space-y-4 text-[#94A3B8] font-bold">
-                     <li><Link href="#" className="hover:text-white transition-colors">Features</Link></li>
-                     <li><Link href="#" className="hover:text-white transition-colors">Pricing</Link></li>
-                     <li><Link href="#" className="hover:text-white transition-colors">Case Studies</Link></li>
-                     <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
-                  </ul>
-               </div>
-
-               <div className="space-y-8">
-                  <div className="text-[10px] text-white font-black uppercase tracking-[0.4em]">Legal</div>
-                  <ul className="space-y-4 text-[#94A3B8] font-bold">
-                     <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                     <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                     <li><Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link></li>
-                     <li><Link href="#" className="hover:text-white transition-colors">Security</Link></li>
-                  </ul>
+               <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-16">
+                  <div className="space-y-6">
+                     <div className="text-xs text-white font-black uppercase tracking-widest">Product</div>
+                     <ul className="space-y-3 text-sm text-[#64748B] font-bold">
+                        <li><Link href="#" className="hover:text-white transition-colors">Features</Link></li>
+                        <li><Link href="#" className="hover:text-white transition-colors">Integrations</Link></li>
+                        <li><Link href="#" className="hover:text-white transition-colors">Pricing</Link></li>
+                     </ul>
+                  </div>
+                  <div className="space-y-6">
+                     <div className="text-xs text-white font-black uppercase tracking-widest">Company</div>
+                     <ul className="space-y-3 text-sm text-[#64748B] font-bold">
+                        <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
+                        <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
+                        <li><Link href="#" className="hover:text-white transition-colors">Contact</Link></li>
+                     </ul>
+                  </div>
+                  <div className="space-y-6 col-span-2 md:col-span-1">
+                     <div className="text-xs text-white font-black uppercase tracking-widest">Connect</div>
+                     <div className="flex gap-4">
+                        <div className="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 cursor-pointer transition-colors text-white font-bold">X</div>
+                        <div className="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 cursor-pointer transition-colors text-white font-bold">in</div>
+                     </div>
+                  </div>
                </div>
             </div>
 
-            <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-               <div className="text-[#64748B] text-sm font-medium italic">© 2026 AI Workplace Monitor Service. All rights reserved.</div>
-               <div className="flex gap-10">
-                  <Link href="#" className="text-[#64748B] hover:text-white transition-colors"><Image src="/facebook.svg" alt="Social" width={20} height={20} className="invert opacity-30 hover:opacity-100" />Facebook</Link>
-                  <Link href="#" className="text-[#64748B] hover:text-white transition-colors">Twitter</Link>
-                  <Link href="#" className="text-[#64748B] hover:text-white transition-colors">LinkedIn</Link>
+            <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+               <div className="text-[#475569] text-xs font-semibold">© 2026 AI Workplace Monitor. All rights reserved.</div>
+               <div className="flex gap-6 text-[#475569] text-xs font-semibold">
+                  <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+                  <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
                </div>
             </div>
          </div>

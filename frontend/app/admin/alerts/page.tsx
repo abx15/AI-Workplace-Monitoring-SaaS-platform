@@ -18,15 +18,17 @@ export default function AdminAlerts() {
 
   const filteredAlerts = alerts.filter(alert => {
     const matchesFilter = filter === 'all' || alert.status === filter
-    const matchesSearch = alert.camera_id.toLowerCase().includes(search.toLowerCase()) || 
-                          alert.type.toLowerCase().includes(search.toLowerCase())
+    const cameraId = alert.cameraId || alert.camera_id || ''
+    const alertType = alert.alertType || alert.type || ''
+    const matchesSearch = cameraId.toLowerCase().includes(search.toLowerCase()) || 
+                          alertType.toLowerCase().includes(search.toLowerCase())
     return matchesFilter && matchesSearch
   })
 
   const handleBulkResolve = async () => {
     const pendingAlerts = alerts.filter(a => a.status === 'pending')
     try {
-      await Promise.all(pendingAlerts.map(a => updateAlertStatus(a.id, 'resolved')))
+      await Promise.all(pendingAlerts.map(a => updateAlertStatus(a._id || a.id || '', 'resolved')))
       toast.success('All pending alerts resolved')
     } catch (error) {
       toast.error('Failed to resolve some alerts')
@@ -91,7 +93,7 @@ export default function AdminAlerts() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredAlerts.map((alert) => (
           <AlertCard 
-            key={alert.id} 
+            key={alert._id || alert.id || ''} 
             alert={alert} 
             onResolve={(id) => updateAlertStatus(id, 'resolved')}
             onIgnore={(id) => updateAlertStatus(id, 'ignored')}

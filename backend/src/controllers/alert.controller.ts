@@ -6,8 +6,15 @@ import { Camera } from '../models/Camera';
 // Get all alerts for a company
 export const getAlerts = async (req: Request, res: Response) => {
   try {
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
     const { page = 1, limit = 20, severity, isResolved, alertType } = req.query;
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     // Build query
     const query: any = { companyId };
@@ -52,7 +59,14 @@ export const getAlerts = async (req: Request, res: Response) => {
 export const getAlertById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     const alert = await Alert.findOne({ _id: id, companyId })
       .populate('employeeId', 'name email employeeId')
@@ -83,7 +97,7 @@ export const getAlertById = async (req: Request, res: Response) => {
 // Create new alert
 export const createAlert = async (req: Request, res: Response) => {
   try {
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
     const { 
       employeeId, 
       cameraId, 
@@ -92,6 +106,13 @@ export const createAlert = async (req: Request, res: Response) => {
       message, 
       metadata 
     } = req.body;
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     if (!alertType || !message) {
       return res.status(400).json({
@@ -156,7 +177,14 @@ export const createAlert = async (req: Request, res: Response) => {
 export const resolveAlert = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     const alert = await Alert.findOneAndUpdate(
       { _id: id, companyId },
@@ -195,8 +223,15 @@ export const resolveAlert = async (req: Request, res: Response) => {
 // Get alert statistics
 export const getAlertStats = async (req: Request, res: Response) => {
   try {
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
     const { timeframe = '7d' } = req.query;
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     // Calculate date range
     const now = new Date();
@@ -297,8 +332,15 @@ export const getAlertStats = async (req: Request, res: Response) => {
 export const getEmployeeAlerts = async (req: Request, res: Response) => {
   try {
     const { employeeId } = req.params;
-    const { companyId } = req.body; // Should come from auth middleware
+    const companyId = req.user?.companyId; // From auth middleware
     const { page = 1, limit = 20 } = req.query;
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company ID required'
+      });
+    }
 
     // Verify employee belongs to company
     const employee = await User.findOne({ _id: employeeId, companyId });

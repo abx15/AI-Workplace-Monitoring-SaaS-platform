@@ -12,6 +12,7 @@ import userRoutes from './routes/user.routes';
 import cameraRoutes from './routes/camera.routes';
 import alertRoutes from './routes/alert.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import aiRoutes from './routes/ai.routes';
 
 // Apply GLOBAL DNS fix first
 const dns = require('dns');
@@ -36,6 +37,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/cameras', cameraRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
